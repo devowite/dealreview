@@ -8,6 +8,8 @@
     --input-bg: #fff;
     --progress-bar-bg: #e9ecef;
     --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
 }
 
 body {
@@ -29,9 +31,17 @@ body {
 }
 
 header {
-    margin-bottom: 25px;
-    border-bottom: 1px solid var(--border-color);
     padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 25px;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 h1 {
@@ -39,6 +49,33 @@ h1 {
     font-weight: 700;
     margin: 0;
 }
+
+.top-action-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.top-action-buttons button {
+    padding: 10px 20px;
+    font-size: 0.95em;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+#save-deal-btn {
+    background-color: var(--success-color);
+    color: white;
+}
+#save-deal-btn:hover { background-color: #218838; }
+
+#load-deal-btn {
+    background-color: #6c757d;
+    color: white;
+}
+#load-deal-btn:hover { background-color: #5a6268; }
 
 /* --- Floating Progress Bar Styles --- */
 #floating-progress-bar {
@@ -65,6 +102,10 @@ h1 {
     margin-right: auto;
 }
 
+#progress-status {
+    font-weight: 700;
+}
+
 .progress-bar {
     width: 100%;
     background-color: var(--progress-bar-bg);
@@ -79,9 +120,9 @@ h1 {
 .progress-bar-fill {
     height: 100%;
     width: 0;
-    background-color: var(--success-color);
+    background-color: var(--danger-color); /* Default to red */
     border-radius: 20px;
-    transition: width 0.4s ease;
+    transition: width 0.4s ease, background-color 0.4s ease;
 }
 /* --- End Floating Bar Styles --- */
 
@@ -241,18 +282,6 @@ td input[type="text"] {
 .action-buttons button:active {
     transform: scale(0.98);
 }
-
-#save-deal-btn {
-    background-color: var(--success-color);
-    color: white;
-}
-#save-deal-btn:hover { background-color: #218838; }
-
-#load-deal-btn {
-    background-color: #6c757d;
-    color: white;
-}
-#load-deal-btn:hover { background-color: #5a6268; }
 
 #analyze-deal-btn {
     background-color: var(--primary-color);

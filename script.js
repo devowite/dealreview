@@ -37,21 +37,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CORE FUNCTIONS ---
 
     const updateProgress = () => {
+        // Get all checklist items that are currently visible on the page
         const visibleItems = checklistItems.filter(item => item.offsetParent !== null);
         const totalCount = visibleItems.length;
 
         let completedCount = 0;
+        // Loop through each visible item to see if it's "complete"
         visibleItems.forEach(item => {
             const checkbox = item.querySelector('input[type="checkbox"]');
             const textarea = item.querySelector('textarea');
 
             if (checkbox) {
-                // If there's a checkbox, its status determines completion
+                // If an item has a checkbox, its completion is determined only by the checkbox.
                 if (checkbox.checked) {
                     completedCount++;
                 }
             } else if (textarea) {
-                // If there's NO checkbox but there IS a textarea, completion depends on it being filled
+                // If it has NO checkbox but DOES have a textarea, completion is based on the text.
                 if (textarea.value.trim() !== '') {
                     completedCount++;
                 }
@@ -60,22 +62,27 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
         
-        progressBarFill.style.width = `${percentage}%`;
+        // Update the progress bar text and fill width
         progressText.textContent = `${percentage}%`;
+        progressBarFill.style.width = `${percentage}%`;
 
-        // Update status and color based on percentage
+        // Update the status text and color based on the percentage
+        const rootStyles = getComputedStyle(document.documentElement);
         if (percentage < 65) {
             progressStatus.textContent = 'Major Risk';
-            progressStatus.style.color = 'var(--danger-color)';
-            progressBarFill.style.backgroundColor = 'var(--danger-color)';
+            const color = rootStyles.getPropertyValue('--danger-color').trim();
+            progressStatus.style.color = color;
+            progressBarFill.style.backgroundColor = color;
         } else if (percentage < 90) {
             progressStatus.textContent = 'Minor Risk';
-            progressStatus.style.color = 'var(--warning-color)';
-            progressBarFill.style.backgroundColor = 'var(--warning-color)';
+            const color = rootStyles.getPropertyValue('--warning-color').trim();
+            progressStatus.style.color = color;
+            progressBarFill.style.backgroundColor = color;
         } else {
             progressStatus.textContent = 'Strong';
-            progressStatus.style.color = 'var(--success-color)';
-            progressBarFill.style.backgroundColor = 'var(--success-color)';
+            const color = rootStyles.getPropertyValue('--success-color').trim();
+            progressStatus.style.color = color;
+            progressBarFill.style.backgroundColor = color;
         }
     };
     
@@ -105,9 +112,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // Explicitly handle checkboxes to ensure Yes/No status
+        // Explicitly handle checkboxes to ensure Yes/No status for the AI
         document.querySelectorAll('#interactive-checklist input[type="checkbox"]').forEach(cb => {
-            data[cb.name] = cb.checked ? 'Yes' : 'No';
+            // Only include visible checkboxes in the final data
+            if (cb.offsetParent !== null) {
+                 data[cb.name] = cb.checked ? 'Yes' : 'No';
+            }
         });
 
         return data;
@@ -119,7 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const element = form.elements[key];
             if (element) {
                 if (element.type === 'checkbox') {
-                    // Handle both boolean from old saves and new 'Yes'/'No' string
                     element.checked = data[key] === true || data[key] === 'Yes';
                 } else {
                     element.value = data[key];
@@ -127,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (key === 'path-to-close' && Array.isArray(data[key])) {
                 pathToCloseContainer.innerHTML = '';
                 data[key].forEach(step => {
-                    if (step) { // Ensure step is not empty
+                    if (step) {
                         const div = document.createElement('div');
                         div.className = 'path-item';
                         div.innerHTML = `<input type="text" name="path-to-close[]" value="${step}">`;
@@ -140,6 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- EVENT LISTENERS ---
+    // Add listeners to all interactive checklist elements to trigger progress updates
     allCheckboxesAndTextareas.forEach(el => {
         el.addEventListener('input', updateProgress);
         el.addEventListener('change', updateProgress);
@@ -286,5 +296,6 @@ ${JSON.stringify(dealData, null, 2)}
     });
 
     // --- INITIALIZATION ---
+    // Run on page load to set the initial state correctly.
     handleBudgetCheckboxChange();
 });

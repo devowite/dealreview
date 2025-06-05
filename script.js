@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- ELEMENT SELECTORS ---
     const form = document.getElementById('deal-form');
     const checklistItems = Array.from(document.querySelectorAll('#interactive-checklist .checklist-item'));
-    const allCheckboxesAndTextareas = document.querySelectorAll('#interactive-checklist input[type="checkbox"], #interactive-checklist textarea');
     
     const progressBarFill = document.getElementById('progress-bar-fill');
     const progressText = document.getElementById('progress-text');
@@ -29,7 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalCloseBtn = document.querySelector('.close-button');
     const aiResponseContainer = document.getElementById('ai-response');
 
-    // Conditional Question Elements
     const hasBudgetCheckbox = form.elements['chk_hasBudget'];
     const noBudgetQuestionWrapper = document.getElementById('no-budget-question-wrapper');
     const noBudgetCheckbox = form.elements['chk_economicBuyerCanSecureFunds'];
@@ -37,18 +35,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CORE FUNCTIONS ---
 
     const updateProgress = () => {
-        // Get all checklist items that are currently visible on the page
+        // 1. Get all checklist items that are currently visible on the page
         const visibleItems = checklistItems.filter(item => item.offsetParent !== null);
         const totalCount = visibleItems.length;
 
+        // 2. Calculate how many are "complete"
         let completedCount = 0;
-        // Loop through each visible item to see if it's "complete"
         visibleItems.forEach(item => {
             const checkbox = item.querySelector('input[type="checkbox"]');
             const textarea = item.querySelector('textarea');
 
             if (checkbox) {
-                // If an item has a checkbox, its completion is determined only by the checkbox.
+                // If an item has a checkbox, its completion is determined *only* by the checkbox.
                 if (checkbox.checked) {
                     completedCount++;
                 }
@@ -60,29 +58,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
+        // 3. Calculate percentage
         const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
         
-        // Update the progress bar text and fill width
+        // 4. Update the progress bar UI (Text, Status, Color)
         progressText.textContent = `${percentage}%`;
         progressBarFill.style.width = `${percentage}%`;
 
-        // Update the status text and color based on the percentage
-        const rootStyles = getComputedStyle(document.documentElement);
         if (percentage < 65) {
             progressStatus.textContent = 'Major Risk';
-            const color = rootStyles.getPropertyValue('--danger-color').trim();
-            progressStatus.style.color = color;
-            progressBarFill.style.backgroundColor = color;
+            progressBarFill.style.backgroundColor = 'var(--danger-color)';
+            progressStatus.style.color = 'var(--danger-color)';
         } else if (percentage < 90) {
             progressStatus.textContent = 'Minor Risk';
-            const color = rootStyles.getPropertyValue('--warning-color').trim();
-            progressStatus.style.color = color;
-            progressBarFill.style.backgroundColor = color;
+            progressBarFill.style.backgroundColor = 'var(--warning-color)';
+            progressStatus.style.color = 'var(--warning-color)';
         } else {
             progressStatus.textContent = 'Strong';
-            const color = rootStyles.getPropertyValue('--success-color').trim();
-            progressStatus.style.color = color;
-            progressBarFill.style.backgroundColor = color;
+            progressBarFill.style.backgroundColor = 'var(--success-color)';
+            progressStatus.style.color = 'var(--success-color)';
         }
     };
     
@@ -112,9 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // Explicitly handle checkboxes to ensure Yes/No status for the AI
         document.querySelectorAll('#interactive-checklist input[type="checkbox"]').forEach(cb => {
-            // Only include visible checkboxes in the final data
             if (cb.offsetParent !== null) {
                  data[cb.name] = cb.checked ? 'Yes' : 'No';
             }
@@ -149,12 +141,16 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- EVENT LISTENERS ---
-    // Add listeners to all interactive checklist elements to trigger progress updates
-    allCheckboxesAndTextareas.forEach(el => {
-        el.addEventListener('input', updateProgress);
-        el.addEventListener('change', updateProgress);
+    // Use a single, more reliable event listener on the form itself.
+    form.addEventListener('input', () => {
+        // A specific check for the budget checkbox to handle visibility logic
+        if (event.target === hasBudgetCheckbox) {
+            handleBudgetCheckboxChange();
+        } else {
+            // For all other inputs, just update the progress
+            updateProgress();
+        }
     });
-    hasBudgetCheckbox.addEventListener('change', handleBudgetCheckboxChange);
 
     addPathStepBtn.addEventListener('click', () => {
         const div = document.createElement('div');

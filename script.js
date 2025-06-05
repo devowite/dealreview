@@ -6,14 +6,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const AIRTABLE_TABLE_NAME = 'YOUR_TABLE_NAME';
     const AIRTABLE_API_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`;
 
-    const OPENAI_API_KEY = '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';
+    const OPENAI_API_KEY = 'PLACEHOLDERKEY';
     const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
     // --- ELEMENT SELECTORS ---
     const form = document.getElementById('deal-form');
-    const allCheckboxes = Array.from(document.querySelectorAll('#interactive-checklist input[type="checkbox"]'));
+    const checklistItems = Array.from(document.querySelectorAll('#interactive-checklist .checklist-item'));
+    const allCheckboxesAndTextareas = document.querySelectorAll('#interactive-checklist input[type="checkbox"], #interactive-checklist textarea');
+    
     const progressBarFill = document.getElementById('progress-bar-fill');
     const progressText = document.getElementById('progress-text');
+    const progressStatus = document.getElementById('progress-status');
+
     const addPathStepBtn = document.getElementById('add-path-step');
     const pathToCloseContainer = document.getElementById('path-to-close-container');
 
@@ -33,48 +37,79 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CORE FUNCTIONS ---
 
     const updateProgress = () => {
-        // Filter for only visible checkboxes to calculate progress
-        const visibleCheckboxes = allCheckboxes.filter(cb => {
-            return cb.offsetParent !== null; // A simple and effective way to check for visibility
+        const visibleItems = checklistItems.filter(item => item.offsetParent !== null);
+        const totalCount = visibleItems.length;
+
+        let completedCount = 0;
+        visibleItems.forEach(item => {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            const textarea = item.querySelector('textarea');
+
+            if (checkbox) {
+                // If there's a checkbox, its status determines completion
+                if (checkbox.checked) {
+                    completedCount++;
+                }
+            } else if (textarea) {
+                // If there's NO checkbox but there IS a textarea, completion depends on it being filled
+                if (textarea.value.trim() !== '') {
+                    completedCount++;
+                }
+            }
         });
-        const checkedCount = visibleCheckboxes.filter(cb => cb.checked).length;
-        const totalCount = visibleCheckboxes.length;
-        const percentage = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
+        
+        const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
         
         progressBarFill.style.width = `${percentage}%`;
         progressText.textContent = `${percentage}%`;
+
+        // Update status and color based on percentage
+        if (percentage < 65) {
+            progressStatus.textContent = 'Major Risk';
+            progressStatus.style.color = 'var(--danger-color)';
+            progressBarFill.style.backgroundColor = 'var(--danger-color)';
+        } else if (percentage < 90) {
+            progressStatus.textContent = 'Minor Risk';
+            progressStatus.style.color = 'var(--warning-color)';
+            progressBarFill.style.backgroundColor = 'var(--warning-color)';
+        } else {
+            progressStatus.textContent = 'Strong';
+            progressStatus.style.color = 'var(--success-color)';
+            progressBarFill.style.backgroundColor = 'var(--success-color)';
+        }
     };
     
     const handleBudgetCheckboxChange = () => {
         if (hasBudgetCheckbox.checked) {
             noBudgetQuestionWrapper.style.display = 'none';
             noBudgetCheckbox.checked = false; 
-            noBudgetCheckbox.disabled = true; // Disable it when hidden
+            noBudgetCheckbox.disabled = true;
         } else {
             noBudgetQuestionWrapper.style.display = 'block';
-            noBudgetCheckbox.disabled = false; // Re-enable it when visible
+            noBudgetCheckbox.disabled = false;
         }
-        // Recalculate progress any time the visibility changes
         updateProgress();
     };
 
     const getFormData = () => {
-        const formData = new FormData(form);
         const data = {};
+        const formData = new FormData(form);
+
         for (let [key, value] of formData.entries()) {
             if (key.endsWith('[]')) {
                 const arrayKey = key.slice(0, -2);
                 if (!data[arrayKey]) data[arrayKey] = [];
                 data[arrayKey].push(value);
             } else {
-                const element = form.elements[key];
-                if (element && element.type === 'checkbox') {
-                    data[key] = element.checked;
-                } else {
-                    data[key] = value;
-                }
+                data[key] = value;
             }
         }
+        
+        // Explicitly handle checkboxes to ensure Yes/No status
+        document.querySelectorAll('#interactive-checklist input[type="checkbox"]').forEach(cb => {
+            data[cb.name] = cb.checked ? 'Yes' : 'No';
+        });
+
         return data;
     };
     
@@ -84,27 +119,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const element = form.elements[key];
             if (element) {
                 if (element.type === 'checkbox') {
-                    element.checked = data[key] === true || data[key] === 'true';
+                    // Handle both boolean from old saves and new 'Yes'/'No' string
+                    element.checked = data[key] === true || data[key] === 'Yes';
                 } else {
                     element.value = data[key];
                 }
             } else if (key === 'path-to-close' && Array.isArray(data[key])) {
                 pathToCloseContainer.innerHTML = '';
                 data[key].forEach(step => {
-                    const div = document.createElement('div');
-                    div.className = 'path-item';
-                    div.innerHTML = `<input type="text" name="path-to-close[]" value="${step}">`;
-                    pathToCloseContainer.appendChild(div);
+                    if (step) { // Ensure step is not empty
+                        const div = document.createElement('div');
+                        div.className = 'path-item';
+                        div.innerHTML = `<input type="text" name="path-to-close[]" value="${step}">`;
+                        pathToCloseContainer.appendChild(div);
+                    }
                 });
             }
         }
-        // After loading data, ensure conditional visibility is correct
-        handleBudgetCheckboxChange(); 
+        handleBudgetCheckboxChange();
     };
 
     // --- EVENT LISTENERS ---
-
-    allCheckboxes.forEach(cb => cb.addEventListener('change', updateProgress));
+    allCheckboxesAndTextareas.forEach(el => {
+        el.addEventListener('input', updateProgress);
+        el.addEventListener('change', updateProgress);
+    });
     hasBudgetCheckbox.addEventListener('change', handleBudgetCheckboxChange);
 
     addPathStepBtn.addEventListener('click', () => {
@@ -121,8 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- API INTERACTIONS (UNCHANGED) ---
-
+    // --- API INTERACTIONS ---
     saveBtn.addEventListener('click', async () => {
         const dealData = getFormData();
         const opportunityName = dealData.opportunityName;
@@ -216,10 +254,9 @@ document.addEventListener('DOMContentLoaded', () => {
         aiResponseContainer.innerHTML = 'Thinking... Please wait.';
         modal.style.display = 'block';
 
-        const promptForAI = `
-I have provided the following information about my sales opportunity at ScreenCloud. Please identify any key areas that may need additional bolstering and suggest ways that I can get this information.
+        const promptForAI = `Review the submitted information from the deal checklist and spotlight any potential weaknesses and/or missing information, what risks the missing information poses, and suggest how the information could be retrieved or improved.
 
-Here is the data in JSON format:
+Here is the deal data:
 ${JSON.stringify(dealData, null, 2)}
 `;
         try {
@@ -249,6 +286,5 @@ ${JSON.stringify(dealData, null, 2)}
     });
 
     // --- INITIALIZATION ---
-    // Run on page load to set the initial state correctly.
     handleBudgetCheckboxChange();
 });

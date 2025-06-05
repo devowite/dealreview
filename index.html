@@ -12,7 +12,13 @@
 <body>
     <div class="container">
         <header>
-            <h1>Deal Checklist</h1>
+            <div class="header-content">
+                <h1>Deal Checklist</h1>
+                <div class="top-action-buttons">
+                    <button type="button" id="save-deal-btn">Save Deal</button>
+                    <button type="button" id="load-deal-btn">Load Deal</button>
+                </div>
+            </div>
         </header>
 
         <form id="deal-form">
@@ -174,7 +180,7 @@
 
                 <fieldset>
                     <legend>Budget & Procurement</legend>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_hasBudget" checked>Has the prospect confirmed they have an allocated budget for this project?</label></div>
+                    <div class="checklist-item"><label><input type="checkbox" name="chk_hasBudget">Has the prospect confirmed they have an allocated budget for this project?</label></div>
                     <div id="no-budget-question-wrapper">
                         <div class="checklist-item"><label><input type="checkbox" name="chk_economicBuyerCanSecureFunds">If no formal budget exists, has the economic buyer confirmed they have the authority and willingness to secure funds for this initiative?</label></div>
                     </div>
@@ -230,8 +236,6 @@
             </div>
 
             <div class="action-buttons">
-                <button type="button" id="save-deal-btn">Save Deal</button>
-                <button type="button" id="load-deal-btn">Load Deal</button>
                 <button type="button" id="analyze-deal-btn">Let AI Analyze</button>
             </div>
         </form>
@@ -247,7 +251,10 @@
 
     <div id="floating-progress-bar" class="progress-container">
         <div class="progress-bar-label">
-            <span>Checklist Progress</span>
+            <div>
+                <span>Status: </span>
+                <span id="progress-status">Major Risk</span>
+            </div>
             <span id="progress-text">0%</span>
         </div>
         <div class="progress-bar">

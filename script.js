@@ -1,19 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- CONFIGURATION ---
-    // IMPORTANT: Replace these placeholders with your actual Airtable details.
     const AIRTABLE_API_KEY = 'YOUR_AIRTABLE_API_KEY';
     const AIRTABLE_BASE_ID = 'YOUR_AIRTABLE_BASE_ID';
     const AIRTABLE_TABLE_NAME = 'YOUR_TABLE_NAME';
     const AIRTABLE_API_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`;
 
-    // This is the key you provided for the OpenAI API.
     const OPENAI_API_KEY = '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';
     const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
     // --- ELEMENT SELECTORS ---
     const form = document.getElementById('deal-form');
-    const checkboxes = document.querySelectorAll('#interactive-checklist input[type="checkbox"]');
+    const allCheckboxes = Array.from(document.querySelectorAll('#interactive-checklist input[type="checkbox"]'));
     const progressBarFill = document.getElementById('progress-bar-fill');
     const progressText = document.getElementById('progress-text');
     const addPathStepBtn = document.getElementById('add-path-step');
@@ -27,28 +25,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalCloseBtn = document.querySelector('.close-button');
     const aiResponseContainer = document.getElementById('ai-response');
 
+    // Conditional Question Elements
+    const hasBudgetCheckbox = form.elements['chk_hasBudget'];
+    const noBudgetQuestionWrapper = document.getElementById('no-budget-question-wrapper');
+    const noBudgetCheckbox = form.elements['chk_economicBuyerCanSecureFunds'];
+
     // --- CORE FUNCTIONS ---
 
     const updateProgress = () => {
-        const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
-        const totalCount = checkboxes.length;
+        // Filter for only visible checkboxes to calculate progress
+        const visibleCheckboxes = allCheckboxes.filter(cb => {
+            return cb.offsetParent !== null; // A simple and effective way to check for visibility
+        });
+        const checkedCount = visibleCheckboxes.filter(cb => cb.checked).length;
+        const totalCount = visibleCheckboxes.length;
         const percentage = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
         
         progressBarFill.style.width = `${percentage}%`;
         progressText.textContent = `${percentage}%`;
     };
     
+    const handleBudgetCheckboxChange = () => {
+        if (hasBudgetCheckbox.checked) {
+            noBudgetQuestionWrapper.style.display = 'none';
+            noBudgetCheckbox.checked = false; 
+            noBudgetCheckbox.disabled = true; // Disable it when hidden
+        } else {
+            noBudgetQuestionWrapper.style.display = 'block';
+            noBudgetCheckbox.disabled = false; // Re-enable it when visible
+        }
+        // Recalculate progress any time the visibility changes
+        updateProgress();
+    };
+
     const getFormData = () => {
         const formData = new FormData(form);
         const data = {};
-        // Convert FormData to a simple object
         for (let [key, value] of formData.entries()) {
-            if (key.endsWith('[]')) { // Handle array fields like 'path-to-close'
+            if (key.endsWith('[]')) {
                 const arrayKey = key.slice(0, -2);
                 if (!data[arrayKey]) data[arrayKey] = [];
                 data[arrayKey].push(value);
             } else {
-                 // For checkboxes, record true/false instead of 'on'
                 const element = form.elements[key];
                 if (element && element.type === 'checkbox') {
                     data[key] = element.checked;
@@ -61,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const setFormData = (data) => {
-        form.reset(); // Clear form first
+        form.reset(); 
         for (const key in data) {
             const element = form.elements[key];
             if (element) {
@@ -71,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     element.value = data[key];
                 }
             } else if (key === 'path-to-close' && Array.isArray(data[key])) {
-                // Special handling for dynamic 'path-to-close'
                 pathToCloseContainer.innerHTML = '';
                 data[key].forEach(step => {
                     const div = document.createElement('div');
@@ -81,12 +98,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         }
-        updateProgress(); // Update progress bar after loading data
+        // After loading data, ensure conditional visibility is correct
+        handleBudgetCheckboxChange(); 
     };
 
     // --- EVENT LISTENERS ---
 
-    checkboxes.forEach(cb => cb.addEventListener('change', updateProgress));
+    allCheckboxes.forEach(cb => cb.addEventListener('change', updateProgress));
+    hasBudgetCheckbox.addEventListener('change', handleBudgetCheckboxChange);
 
     addPathStepBtn.addEventListener('click', () => {
         const div = document.createElement('div');
@@ -102,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- API INTERACTIONS ---
+    // --- API INTERACTIONS (UNCHANGED) ---
 
     saveBtn.addEventListener('click', async () => {
         const dealData = getFormData();
@@ -112,29 +131,22 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Please enter an Opportunity Name before saving.');
             return;
         }
-
         if (AIRTABLE_API_KEY === 'YOUR_AIRTABLE_API_KEY') {
             alert('Please configure your Airtable API Key in script.js');
             return;
         }
-
         saveBtn.textContent = 'Saving...';
         saveBtn.disabled = true;
 
         try {
-            // First, check if a record with this name already exists
             const searchUrl = `${AIRTABLE_API_URL}?filterByFormula={opportunityName}="${opportunityName}"`;
-            const searchRes = await fetch(searchUrl, {
-                headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` }
-            });
+            const searchRes = await fetch(searchUrl, { headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` } });
             const searchData = await searchRes.json();
             
             let method = 'POST';
             let url = AIRTABLE_API_URL;
-            let recordId = null;
-
             if (searchData.records && searchData.records.length > 0) {
-                recordId = searchData.records[0].id;
+                const recordId = searchData.records[0].id;
                 method = 'PATCH';
                 url = `${AIRTABLE_API_URL}/${recordId}`;
             }
@@ -142,10 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const body = JSON.stringify({ fields: dealData });
             const response = await fetch(url, {
                 method: method,
-                headers: {
-                    'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}`, 'Content-Type': 'application/json' },
                 body: body
             });
 
@@ -153,9 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const error = await response.json();
                 throw new Error(`Airtable Error: ${error.error.message}`);
             }
-            
             alert(`Deal "${opportunityName}" saved successfully!`);
-
         } catch (error) {
             console.error('Save Error:', error);
             alert(`Failed to save deal. Check console for details. Error: ${error.message}`);
@@ -173,18 +180,13 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Please configure your Airtable API Key in script.js');
             return;
         }
-
         loadBtn.textContent = 'Loading...';
         loadBtn.disabled = true;
 
         try {
             const url = `${AIRTABLE_API_URL}?filterByFormula={opportunityName}="${opportunityName}"&maxRecords=1`;
-            const response = await fetch(url, {
-                headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` }
-            });
-
+            const response = await fetch(url, { headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` } });
             if (!response.ok) throw new Error('Failed to fetch data from Airtable.');
-
             const data = await response.json();
 
             if (data.records && data.records.length > 0) {
@@ -193,7 +195,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 alert(`No deal found with the name "${opportunityName}".`);
             }
-
         } catch (error) {
             console.error('Load Error:', error);
             alert('Failed to load deal. Check console for details.');
@@ -224,10 +225,7 @@ ${JSON.stringify(dealData, null, 2)}
         try {
             const response = await fetch(OPENAI_API_URL, {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Authorization': `Bearer ${OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     model: "gpt-4-turbo",
                     messages: [{ "role": "user", "content": promptForAI }],
@@ -239,10 +237,8 @@ ${JSON.stringify(dealData, null, 2)}
                 const error = await response.json();
                 throw new Error(`OpenAI API Error: ${error.error.message}`);
             }
-            
             const result = await response.json();
             aiResponseContainer.textContent = result.choices[0].message.content;
-
         } catch (error) {
             console.error('AI Analysis Error:', error);
             aiResponseContainer.textContent = `An error occurred while analyzing the deal. Please check the console. \n\nError: ${error.message}`;
@@ -253,5 +249,6 @@ ${JSON.stringify(dealData, null, 2)}
     });
 
     // --- INITIALIZATION ---
-    updateProgress();
+    // Run on page load to set the initial state correctly.
+    handleBudgetCheckboxChange();
 });

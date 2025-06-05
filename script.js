@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- CONFIGURATION ---
     const AIRTABLE_API_KEY = 'patJxOmigJwrvtgTd.28e49bbd537cfa9b126dfd2158d554f105293edc2a13524718f2eb0b2d4e4d08';
-    const AIRTABLE_BASE_ID = 'tbl3cE6PUeZLo8TFk';
+    const AIRTABLE_BASE_ID = 'appyia5p2EHag1uhd';
     const AIRTABLE_TABLE_NAME = 'Deals';
     const AIRTABLE_API_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`;
 

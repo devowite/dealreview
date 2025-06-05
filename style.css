@@ -15,7 +15,7 @@ body {
     background-color: var(--background-color);
     color: var(--text-color);
     margin: 0;
-    padding: 20px;
+    padding: 20px 20px 120px 20px; /* Added bottom padding for floating bar */
     line-height: 1.6;
 }
 
@@ -37,11 +37,20 @@ header {
 h1 {
     color: var(--text-color);
     font-weight: 700;
-    margin: 0 0 20px 0;
+    margin: 0;
 }
 
-.progress-container {
+/* --- Floating Progress Bar Styles --- */
+#floating-progress-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
     width: 100%;
+    background-color: var(--container-bg);
+    padding: 15px 30px;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    z-index: 999;
+    box-sizing: border-box;
 }
 
 .progress-bar-label {
@@ -51,6 +60,9 @@ h1 {
     font-size: 0.9em;
     font-weight: 500;
     color: #555;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .progress-bar {
@@ -59,6 +71,9 @@ h1 {
     border-radius: 20px;
     overflow: hidden;
     height: 12px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .progress-bar-fill {
@@ -68,6 +83,7 @@ h1 {
     border-radius: 20px;
     transition: width 0.4s ease;
 }
+/* --- End Floating Bar Styles --- */
 
 fieldset {
     border: 1px solid var(--border-color);

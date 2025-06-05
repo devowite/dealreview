@@ -9,9 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const OPENAI_API_KEY = 'PLACEHOLDERKEY';
     const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
-    // --- ELEMENT SELECTORS ---
+   // --- ELEMENT SELECTORS ---
     const form = document.getElementById('deal-form');
-    // Select ALL fields that can be filled out.
     const allProgressFields = Array.from(form.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], input[type="checkbox"], textarea'));
     
     const progressBarFill = document.getElementById('progress-bar-fill');
@@ -33,14 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const noBudgetQuestionWrapper = document.getElementById('no-budget-question-wrapper');
 
     // --- CORE FUNCTIONS ---
-
     const updateProgress = () => {
-        // 1. Filter the list of all fields to include only those currently visible.
-        // This automatically handles the conditional budget question.
         const visibleFields = allProgressFields.filter(field => field.offsetParent !== null);
         const totalCount = visibleFields.length;
-
-        // 2. Count how many of the visible fields are "complete".
         let completedCount = 0;
         visibleFields.forEach(field => {
             if (field.type === 'checkbox') {
@@ -54,10 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // 3. Calculate percentage
         const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
         
-        // 4. Update the progress bar UI (Text, Status, Color)
         progressText.textContent = `${percentage}%`;
         progressBarFill.style.width = `${percentage}%`;
 
@@ -82,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             noBudgetQuestionWrapper.style.display = 'block';
         }
-        // Always update progress after visibility changes
         updateProgress();
     };
 
@@ -145,12 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addPathStepBtn.addEventListener('click', () => {
         const div = document.createElement('div');
-        div.className = 'path-item';
-        // This new input won't be in our original 'allProgressFields' list.
-        // We must manually add it and re-attach listeners, or simply reload the list.
         div.innerHTML = `<input type="text" name="path-to-close[]" placeholder="Enter another step...">`;
         pathToCloseContainer.appendChild(div);
-        // Easiest way to handle this is to re-run the progress update after adding.
         updateProgress();
     });
     
@@ -178,28 +165,48 @@ document.addEventListener('DOMContentLoaded', () => {
         saveBtn.disabled = true;
 
         try {
+            // First, try to find an existing record to update
             const searchUrl = `${AIRTABLE_API_URL}?filterByFormula={opportunityName}="${opportunityName}"`;
             const searchRes = await fetch(searchUrl, { headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` } });
+            
+            if (!searchRes.ok) {
+                const errorPayload = await searchRes.json();
+                throw new Error(JSON.stringify(errorPayload));
+            }
+            
             const searchData = await searchRes.json();
             
             let method = 'POST';
-            let url = AIRTABLE_API_URL;
+            let recordsPayload;
+
             if (searchData.records && searchData.records.length > 0) {
-                const recordId = searchData.records[0].id;
+                // Record exists, so we will UPDATE (PATCH) it
                 method = 'PATCH';
-                url = `${AIRTABLE_API_URL}/${recordId}`;
+                recordsPayload = {
+                    records: [{
+                        id: searchData.records[0].id,
+                        fields: dealData
+                    }]
+                };
+            } else {
+                // Record does not exist, so we will CREATE (POST) a new one
+                method = 'POST';
+                recordsPayload = {
+                    records: [{
+                        fields: dealData
+                    }]
+                };
             }
 
-            const body = JSON.stringify({ fields: dealData });
-            const response = await fetch(url, {
+            const response = await fetch(AIRTABLE_API_URL, {
                 method: method,
                 headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}`, 'Content-Type': 'application/json' },
-                body: body
+                body: JSON.stringify(recordsPayload)
             });
 
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(`Airtable Error: ${error.error.message}`);
+                const errorPayload = await response.json();
+                throw new Error(JSON.stringify(errorPayload));
             }
             alert(`Deal "${opportunityName}" saved successfully!`);
         } catch (error) {
@@ -212,6 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     loadBtn.addEventListener('click', async () => {
+        // This function remains largely the same but with improved error handling
         const opportunityName = prompt("Enter the Opportunity Name to load:");
         if (!opportunityName) return;
         
@@ -225,40 +233,41 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const url = `${AIRTABLE_API_URL}?filterByFormula={opportunityName}="${opportunityName}"&maxRecords=1`;
             const response = await fetch(url, { headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` } });
-            if (!response.ok) throw new Error('Failed to fetch data from Airtable.');
+            
+            if (!response.ok) {
+                const errorPayload = await response.json();
+                throw new Error(JSON.stringify(errorPayload));
+            }
+            
             const data = await response.json();
 
             if (data.records && data.records.length > 0) {
                 setFormData(data.records[0].fields);
+                alert(`Deal "${opportunityName}" loaded successfully!`);
             } else {
                 alert(`No deal found with the name "${opportunityName}".`);
             }
         } catch (error) {
             console.error('Load Error:', error);
-            alert('Failed to load deal. Check console for details.');
+            alert('Failed to load deal. Check console for details. Error: ${error.message}`);
         } finally {
             loadBtn.textContent = 'Load Deal';
             loadBtn.disabled = false;
         }
     });
-
+    
+    // Analyze function remains unchanged
     analyzeBtn.addEventListener('click', async () => {
         const dealData = getFormData();
         if (!dealData.opportunityName) {
             alert('Please fill out at least the Opportunity Name before analyzing.');
             return;
         }
-
         analyzeBtn.textContent = 'Analyzing...';
         analyzeBtn.disabled = true;
         aiResponseContainer.innerHTML = 'Thinking... Please wait.';
         modal.style.display = 'block';
-
-        const promptForAI = `Review the submitted information from the deal checklist and spotlight any potential weaknesses and/or missing information, what risks the missing information poses, and suggest how the information could be retrieved or improved.
-
-Here is the deal data:
-${JSON.stringify(dealData, null, 2)}
-`;
+        const promptForAI = `Review the submitted information from the deal checklist and spotlight any potential weaknesses and/or missing information, what risks the missing information poses, and suggest how the information could be retrieved or improved.\n\nHere is the deal data:\n${JSON.stringify(dealData, null, 2)}`;
         try {
             const response = await fetch(OPENAI_API_URL, {
                 method: 'POST',
@@ -269,15 +278,13 @@ ${JSON.stringify(dealData, null, 2)}
                     temperature: 0.5
                 })
             });
-
             if (!response.ok) {
                 const error = await response.json();
                 throw new Error(`OpenAI API Error: ${error.error.message}`);
             }
             const result = await response.json();
             aiResponseContainer.textContent = result.choices[0].message.content;
-        } catch (error)
-        {
+        } catch (error) {
             console.error('AI Analysis Error:', error);
             aiResponseContainer.textContent = `An error occurred while analyzing the deal. Please check the console. \n\nError: ${error.message}`;
         } finally {
@@ -287,6 +294,5 @@ ${JSON.stringify(dealData, null, 2)}
     });
 
     // --- INITIALIZATION ---
-    // Run on page load to set the initial state correctly.
     handleBudgetCheckboxChange();
 });

@@ -11,7 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- ELEMENT SELECTORS ---
     const form = document.getElementById('deal-form');
-    const checklistItems = Array.from(document.querySelectorAll('#interactive-checklist .checklist-item'));
+    // Select ALL fields that can be filled out.
+    const allProgressFields = Array.from(form.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], input[type="checkbox"], textarea'));
     
     const progressBarFill = document.getElementById('progress-bar-fill');
     const progressText = document.getElementById('progress-text');
@@ -30,29 +31,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const hasBudgetCheckbox = form.elements['chk_hasBudget'];
     const noBudgetQuestionWrapper = document.getElementById('no-budget-question-wrapper');
-    const noBudgetCheckbox = form.elements['chk_economicBuyerCanSecureFunds'];
 
     // --- CORE FUNCTIONS ---
 
     const updateProgress = () => {
-        // 1. Get all checklist items that are currently visible on the page
-        const visibleItems = checklistItems.filter(item => item.offsetParent !== null);
-        const totalCount = visibleItems.length;
+        // 1. Filter the list of all fields to include only those currently visible.
+        // This automatically handles the conditional budget question.
+        const visibleFields = allProgressFields.filter(field => field.offsetParent !== null);
+        const totalCount = visibleFields.length;
 
-        // 2. Calculate how many are "complete"
+        // 2. Count how many of the visible fields are "complete".
         let completedCount = 0;
-        visibleItems.forEach(item => {
-            const checkbox = item.querySelector('input[type="checkbox"]');
-            const textarea = item.querySelector('textarea');
-
-            if (checkbox) {
-                // If an item has a checkbox, its completion is determined *only* by the checkbox.
-                if (checkbox.checked) {
+        visibleFields.forEach(field => {
+            if (field.type === 'checkbox') {
+                if (field.checked) {
                     completedCount++;
                 }
-            } else if (textarea) {
-                // If it has NO checkbox but DOES have a textarea, completion is based on the text.
-                if (textarea.value.trim() !== '') {
+            } else {
+                if (field.value && field.value.trim() !== '') {
                     completedCount++;
                 }
             }
@@ -83,12 +79,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleBudgetCheckboxChange = () => {
         if (hasBudgetCheckbox.checked) {
             noBudgetQuestionWrapper.style.display = 'none';
-            noBudgetCheckbox.checked = false; 
-            noBudgetCheckbox.disabled = true;
         } else {
             noBudgetQuestionWrapper.style.display = 'block';
-            noBudgetCheckbox.disabled = false;
         }
+        // Always update progress after visibility changes
         updateProgress();
     };
 
@@ -141,13 +135,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- EVENT LISTENERS ---
-    // Use a single, more reliable event listener on the form itself.
-    form.addEventListener('input', () => {
-        // A specific check for the budget checkbox to handle visibility logic
+    form.addEventListener('input', (event) => {
         if (event.target === hasBudgetCheckbox) {
             handleBudgetCheckboxChange();
         } else {
-            // For all other inputs, just update the progress
             updateProgress();
         }
     });
@@ -155,8 +146,12 @@ document.addEventListener('DOMContentLoaded', () => {
     addPathStepBtn.addEventListener('click', () => {
         const div = document.createElement('div');
         div.className = 'path-item';
+        // This new input won't be in our original 'allProgressFields' list.
+        // We must manually add it and re-attach listeners, or simply reload the list.
         div.innerHTML = `<input type="text" name="path-to-close[]" placeholder="Enter another step...">`;
         pathToCloseContainer.appendChild(div);
+        // Easiest way to handle this is to re-run the progress update after adding.
+        updateProgress();
     });
     
     modalCloseBtn.addEventListener('click', () => modal.style.display = 'none');
@@ -235,7 +230,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.records && data.records.length > 0) {
                 setFormData(data.records[0].fields);
-                alert(`Deal "${opportunityName}" loaded successfully!`);
             } else {
                 alert(`No deal found with the name "${opportunityName}".`);
             }
@@ -282,7 +276,8 @@ ${JSON.stringify(dealData, null, 2)}
             }
             const result = await response.json();
             aiResponseContainer.textContent = result.choices[0].message.content;
-        } catch (error) {
+        } catch (error)
+        {
             console.error('AI Analysis Error:', error);
             aiResponseContainer.textContent = `An error occurred while analyzing the deal. Please check the console. \n\nError: ${error.message}`;
         } finally {

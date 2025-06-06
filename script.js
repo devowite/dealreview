@@ -31,6 +31,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const hasBudgetCheckbox = form.elements['chk_hasBudget'];
     const noBudgetQuestionWrapper = document.getElementById('no-budget-question-wrapper');
 
+    const loadDealModal = document.getElementById('load-deal-modal');
+    const loadModalCloseBtn = document.getElementById('load-modal-close-btn');
+    const loadDealSelect = document.getElementById('load-deal-select');
+    const loadSelectedDealBtn = document.getElementById('load-selected-deal-btn');
+    const loadModalError = document.getElementById('load-modal-error');
+
     // --- CORE FUNCTIONS ---
     const updateProgress = () => {
         const visibleFields = allProgressFields.filter(field => field.offsetParent !== null);
@@ -247,43 +253,49 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    loadBtn.addEventListener('click', async () => {
-        // This function remains largely the same but with improved error handling
-        const opportunityName = prompt("Enter the Opportunity Name to load:");
-        if (!opportunityName) return;
-        
-        if (AIRTABLE_API_KEY === 'YOUR_AIRTABLE_API_KEY') {
-            alert('Please configure your Airtable API Key in script.js');
-            return;
-        }
-        loadBtn.textContent = 'Loading...';
-        loadBtn.disabled = true;
+    // NEW: When the main "Load Deal" button is clicked, open the modal and populate it
+loadBtn.addEventListener('click', async () => {
+    loadDealModal.style.display = 'block';
+    loadModalError.textContent = '';
+    loadDealSelect.innerHTML = '<option value="">Loading deals...</option>';
+    loadDealSelect.disabled = true;
+    loadSelectedDealBtn.disabled = true;
 
-        try {
-            const url = `${AIRTABLE_API_URL}?filterByFormula={opportunityName}="${opportunityName}"&maxRecords=1`;
-            const response = await fetch(url, { headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` } });
-            
-            if (!response.ok) {
-                const errorPayload = await response.json();
-                throw new Error(JSON.stringify(errorPayload));
-            }
-            
-            const data = await response.json();
+    try {
+        // We only need the opportunityName field to populate the dropdown. This is more efficient.
+        // We also sort the results by name for convenience.
+        const url = `${AIRTABLE_API_URL}?fields%5B%5D=opportunityName&sort%5B0%5D%5Bfield%5D=opportunityName&sort%5B0%5D%5Bdirection%5D=asc`;
+        const response = await fetch(url, { headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` } });
 
-            if (data.records && data.records.length > 0) {
-                setFormData(data.records[0].fields);
-                alert(`Deal "${opportunityName}" loaded successfully!`);
-            } else {
-                alert(`No deal found with the name "${opportunityName}".`);
-            }
-        } catch (error) {
-            console.error('Load Error:', error);
-            alert(`Failed to load deal. Check console for details. Error: ${error.message}`);
-        } finally {
-            loadBtn.textContent = 'Load Deal';
-            loadBtn.disabled = false;
+        if (!response.ok) {
+            const errorPayload = await response.json();
+            throw new Error(JSON.stringify(errorPayload));
         }
-    });
+
+        const data = await response.json();
+        loadDealSelect.innerHTML = '<option value="">-- Please select a deal --</option>'; // Clear loading message
+
+        if (data.records && data.records.length > 0) {
+            data.records.forEach(record => {
+                // We only add records that have an opportunity name
+                if (record.fields.opportunityName) {
+                    const option = document.createElement('option');
+                    option.value = record.id; // The value of the option is the Record ID
+                    option.textContent = record.fields.opportunityName; // The text is the Opportunity Name
+                    loadDealSelect.appendChild(option);
+                }
+            });
+            loadDealSelect.disabled = false;
+            loadSelectedDealBtn.disabled = false;
+        } else {
+            loadDealSelect.innerHTML = '<option value="">-- No deals found --</option>';
+        }
+
+    } catch (error) {
+        console.error('Error fetching deal list:', error);
+        loadModalError.textContent = `Failed to load deal list. ${error.message}`;
+    }
+});
     
     // Analyze function remains unchanged
     analyzeBtn.addEventListener('click', async () => {
@@ -324,4 +336,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- INITIALIZATION ---
     handleBudgetCheckboxChange();
+});
+
+// --- LOAD DEAL MODAL LOGIC ---
+
+// NEW: When the "Load Selected Deal" button inside the modal is clicked
+loadSelectedDealBtn.addEventListener('click', async () => {
+    const recordId = loadDealSelect.value;
+    if (!recordId) {
+        alert('Please select a deal from the list.');
+        return;
+    }
+
+    loadSelectedDealBtn.textContent = 'Loading...';
+    loadSelectedDealBtn.disabled = true;
+
+    try {
+        const url = `${AIRTABLE_API_URL}/${recordId}`; // Fetch a single record by its ID
+        const response = await fetch(url, { headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` } });
+
+        if (!response.ok) {
+            const errorPayload = await response.json();
+            throw new Error(JSON.stringify(errorPayload));
+        }
+
+        const data = await response.json();
+        setFormData(data.fields); // Use our existing function to fill the form
+        alert(`Deal "${data.fields.opportunityName}" loaded successfully!`);
+        loadDealModal.style.display = 'none'; // Close the modal on success
+
+    } catch (error) {
+        console.error('Load Error:', error);
+        loadModalError.textContent = `Failed to load deal. ${error.message}`;
+    } finally {
+        loadSelectedDealBtn.textContent = 'Load Selected Deal';
+        loadSelectedDealBtn.disabled = false;
+    }
+});
+
+// NEW: Logic to close the modal
+loadModalCloseBtn.addEventListener('click', () => {
+    loadDealModal.style.display = 'none';
 });

@@ -1,5 +1,5 @@
 [build.environment]
   PHP_VERSION = "8.3"
 
-[functions."*"]
+[functions."analyze-deal"]
   timeout = 25

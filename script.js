@@ -307,21 +307,23 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.style.display = 'block';
         const promptForAI = `Review the submitted information from the deal checklist and spotlight any potential weaknesses and/or missing information, what risks the missing information poses, and suggest how the information could be retrieved or improved.\n\nHere is the deal data:\n${JSON.stringify(dealData, null, 2)}`;
         try {
-            const response = await fetch(OPENAI_API_URL, {
+            // The URL now points to our own secure function, not OpenAI
+            // The secret key is GONE from the front-end code
+            const response = await fetch('/.netlify/functions/analyze-deal', {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: "gpt-4-turbo",
-                    messages: [{ "role": "user", "content": promptForAI }],
-                    temperature: 0.5
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ promptForAI: promptForAI }) // Send the prompt data
             });
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(`OpenAI API Error: ${error.error.message}`);
-            }
+
             const result = await response.json();
+            
+            if (!response.ok) {
+                // The serverless function will pass along the error message
+                throw new Error(result.error || 'The analysis failed.');
+            }
+            
             aiResponseContainer.textContent = result.choices[0].message.content;
+
         } catch (error) {
             console.error('AI Analysis Error:', error);
             aiResponseContainer.textContent = `An error occurred while analyzing the deal. Please check the console. \n\nError: ${error.message}`;

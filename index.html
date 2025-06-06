@@ -248,7 +248,21 @@
             </div>
         </div>
     </div>
-
+    
+<div id="load-deal-modal" class="modal">
+        <div class="modal-content">
+            <span id="load-modal-close-btn" class="close-button">&times;</span>
+            <h2>Select a Deal to Load</h2>
+            <div id="load-modal-body">
+                <select id="load-deal-select" name="load-deal-select">
+                    <option value="">Loading deals...</option>
+                </select>
+                <button type="button" id="load-selected-deal-btn">Load Selected Deal</button>
+            </div>
+            <div id="load-modal-error" style="color: var(--danger-color); margin-top: 15px;"></div>
+        </div>
+    </div>
+    
     <div id="floating-progress-bar" class="progress-container">
         <div class="progress-bar-label">
             <div>

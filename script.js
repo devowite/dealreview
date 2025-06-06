@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const OPENAI_API_KEY = 'PLACEHOLDERKEY';
     const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
-   // --- ELEMENT SELECTORS ---
+    // --- ELEMENT SELECTORS ---
     const form = document.getElementById('deal-form');
     const allProgressFields = Array.from(form.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], input[type="checkbox"], textarea'));
     
@@ -87,22 +87,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = {};
         const formData = new FormData(form);
 
-          for (let [key, value] of formData.entries()) {
-      if (key.endsWith('[]')) {
-        // Since the Airtable field is ACTUALLY named with brackets, we use the full key.
-        if (!data[key]) data[key] = [];
-        data[key].push(value);
-      } else {
-        // This handles all other standard fields
-        data[key] = value;
-      }
-    }
+        for (let [key, value] of formData.entries()) {
+            if (key.endsWith('[]')) {
+                // Since the Airtable field is ACTUALLY named with brackets, we use the full key.
+                if (!data[key]) data[key] = [];
+                data[key].push(value);
+            } else {
+                // This handles all other standard fields
+                data[key] = value;
+            }
+        }
         
         document.querySelectorAll('#interactive-checklist input[type="checkbox"]').forEach(cb => {
-    if (cb.offsetParent !== null) {
-         data[cb.name] = cb.checked; // This correctly sends true or false
-    }
-});
+            if (cb.offsetParent !== null) {
+                data[cb.name] = cb.checked; // This correctly sends true or false
+            }
+        });
 
         return data;
     };
@@ -117,9 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     element.value = data[key];
                 }
-            } else if (key === 'path-to-close' && Array.isArray(data[key])) {
+            } else if (key === 'path-to-close[]' && data[key]) {
+                // To properly load from a text block, we split it back into an array
+                const steps = data[key].split('\n');
                 pathToCloseContainer.innerHTML = '';
-                data[key].forEach(step => {
+                steps.forEach(step => {
                     if (step) {
                         const div = document.createElement('div');
                         div.className = 'path-item';
@@ -155,47 +157,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- API INTERACTIONS ---
     saveBtn.addEventListener('click', async () => {
         const dealData = getFormData();
         const opportunityName = dealData.opportunityName;
         
-    // Clean up and format data for the API
-    if (dealData.closeDate === '') {
-        delete dealData.closeDate;
-    }
+        // Clean up and format data for the API
+        if (dealData.closeDate === '') {
+            delete dealData.closeDate;
+        }
 
-    // For 'arr', delete if empty, otherwise convert to a number.
-    if (dealData.arr === '') {
-        delete dealData.arr;
-    } else {
-        dealData.arr = parseInt(dealData.arr, 10);
-    }
+        // For 'arr', delete if empty, otherwise convert to a number.
+        if (dealData.arr === '') {
+            delete dealData.arr;
+        } else {
+            dealData.arr = parseInt(dealData.arr, 10);
+        }
 
-    // For 'screens', delete if empty, otherwise convert to a number.
-    if (dealData.screens === '') {
-        delete dealData.screens;
-    } else {
-        dealData.screens = parseInt(dealData.screens, 10);
-    }
+        // For 'screens', delete if empty, otherwise convert to a number.
+        if (dealData.screens === '') {
+            delete dealData.screens;
+        } else {
+            dealData.screens = parseInt(dealData.screens, 10);
+        }
         
-    // Convert the 'path-to-close[]' array into a single text block for Airtable
-    if (dealData['path-to-close[]'] && Array.isArray(dealData['path-to-close[]'])) {
-        // Join the array into a single string, with each step on a new line,
-        // and filter out any empty steps the user might have accidentally added.
-        dealData['path-to-close[]'] = dealData['path-to-close[]']
-            .filter(step => step.trim() !== '')
-            .join('\n');
-    }
+        // Convert the 'path-to-close[]' array into a single text block for Airtable
+        if (dealData['path-to-close[]'] && Array.isArray(dealData['path-to-close[]'])) {
+            // Join the array into a single string, with each step on a new line,
+            // and filter out any empty steps the user might have accidentally added.
+            dealData['path-to-close[]'] = dealData['path-to-close[]']
+                .filter(step => step.trim() !== '')
+                .join('\n');
+        }
         
         if (!opportunityName) {
             alert('Please enter an Opportunity Name before saving.');
             return;
         }
-        if (AIRTABLE_API_KEY === 'YOUR_AIRTABLE_API_KEY') {
-            alert('Please configure your Airtable API Key in script.js');
-            return;
-        }
+        
         saveBtn.textContent = 'Saving...';
         saveBtn.disabled = true;
 
@@ -253,51 +251,50 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // NEW: When the main "Load Deal" button is clicked, open the modal and populate it
-loadBtn.addEventListener('click', async () => {
-    loadDealModal.style.display = 'block';
-    loadModalError.textContent = '';
-    loadDealSelect.innerHTML = '<option value="">Loading deals...</option>';
-    loadDealSelect.disabled = true;
-    loadSelectedDealBtn.disabled = true;
+    // When the main "Load Deal" button is clicked, open the modal and populate it
+    loadBtn.addEventListener('click', async () => {
+        loadDealModal.style.display = 'block';
+        loadModalError.textContent = '';
+        loadDealSelect.innerHTML = '<option value="">Loading deals...</option>';
+        loadDealSelect.disabled = true;
+        loadSelectedDealBtn.disabled = true;
 
-    try {
-        // We only need the opportunityName field to populate the dropdown. This is more efficient.
-        // We also sort the results by name for convenience.
-        const url = `${AIRTABLE_API_URL}?fields%5B%5D=opportunityName&sort%5B0%5D%5Bfield%5D=opportunityName&sort%5B0%5D%5Bdirection%5D=asc`;
-        const response = await fetch(url, { headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` } });
+        try {
+            // We only need the opportunityName field to populate the dropdown. This is more efficient.
+            // We also sort the results by name for convenience.
+            const url = `${AIRTABLE_API_URL}?fields%5B%5D=opportunityName&sort%5B0%5D%5Bfield%5D=opportunityName&sort%5B0%5D%5Bdirection%5D=asc`;
+            const response = await fetch(url, { headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` } });
 
-        if (!response.ok) {
-            const errorPayload = await response.json();
-            throw new Error(JSON.stringify(errorPayload));
+            if (!response.ok) {
+                const errorPayload = await response.json();
+                throw new Error(JSON.stringify(errorPayload));
+            }
+
+            const data = await response.json();
+            loadDealSelect.innerHTML = '<option value="">-- Please select a deal --</option>'; // Clear loading message
+
+            if (data.records && data.records.length > 0) {
+                data.records.forEach(record => {
+                    // We only add records that have an opportunity name
+                    if (record.fields.opportunityName) {
+                        const option = document.createElement('option');
+                        option.value = record.id; // The value of the option is the Record ID
+                        option.textContent = record.fields.opportunityName; // The text is the Opportunity Name
+                        loadDealSelect.appendChild(option);
+                    }
+                });
+                loadDealSelect.disabled = false;
+                loadSelectedDealBtn.disabled = false;
+            } else {
+                loadDealSelect.innerHTML = '<option value="">-- No deals found --</option>';
+            }
+
+        } catch (error) {
+            console.error('Error fetching deal list:', error);
+            loadModalError.textContent = `Failed to load deal list. ${error.message}`;
         }
-
-        const data = await response.json();
-        loadDealSelect.innerHTML = '<option value="">-- Please select a deal --</option>'; // Clear loading message
-
-        if (data.records && data.records.length > 0) {
-            data.records.forEach(record => {
-                // We only add records that have an opportunity name
-                if (record.fields.opportunityName) {
-                    const option = document.createElement('option');
-                    option.value = record.id; // The value of the option is the Record ID
-                    option.textContent = record.fields.opportunityName; // The text is the Opportunity Name
-                    loadDealSelect.appendChild(option);
-                }
-            });
-            loadDealSelect.disabled = false;
-            loadSelectedDealBtn.disabled = false;
-        } else {
-            loadDealSelect.innerHTML = '<option value="">-- No deals found --</option>';
-        }
-
-    } catch (error) {
-        console.error('Error fetching deal list:', error);
-        loadModalError.textContent = `Failed to load deal list. ${error.message}`;
-    }
-});
+    });
     
-    // Analyze function remains unchanged
     analyzeBtn.addEventListener('click', async () => {
         const dealData = getFormData();
         if (!dealData.opportunityName) {
@@ -334,47 +331,50 @@ loadBtn.addEventListener('click', async () => {
         }
     });
 
-    // --- INITIALIZATION ---
-    handleBudgetCheckboxChange();
-});
+    // --- LOGIC FOR THE LOAD DEAL MODAL ---
+    // MOVED TO BE INSIDE THE DOMCONTENTLOADED WRAPPER
 
-// --- LOAD DEAL MODAL LOGIC ---
-
-// NEW: When the "Load Selected Deal" button inside the modal is clicked
-loadSelectedDealBtn.addEventListener('click', async () => {
-    const recordId = loadDealSelect.value;
-    if (!recordId) {
-        alert('Please select a deal from the list.');
-        return;
-    }
-
-    loadSelectedDealBtn.textContent = 'Loading...';
-    loadSelectedDealBtn.disabled = true;
-
-    try {
-        const url = `${AIRTABLE_API_URL}/${recordId}`; // Fetch a single record by its ID
-        const response = await fetch(url, { headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` } });
-
-        if (!response.ok) {
-            const errorPayload = await response.json();
-            throw new Error(JSON.stringify(errorPayload));
+    // When the "Load Selected Deal" button inside the modal is clicked
+    loadSelectedDealBtn.addEventListener('click', async () => {
+        const recordId = loadDealSelect.value;
+        if (!recordId) {
+            alert('Please select a deal from the list.');
+            return;
         }
 
-        const data = await response.json();
-        setFormData(data.fields); // Use our existing function to fill the form
-        alert(`Deal "${data.fields.opportunityName}" loaded successfully!`);
-        loadDealModal.style.display = 'none'; // Close the modal on success
+        loadSelectedDealBtn.textContent = 'Loading...';
+        loadSelectedDealBtn.disabled = true;
 
-    } catch (error) {
-        console.error('Load Error:', error);
-        loadModalError.textContent = `Failed to load deal. ${error.message}`;
-    } finally {
-        loadSelectedDealBtn.textContent = 'Load Selected Deal';
-        loadSelectedDealBtn.disabled = false;
-    }
-});
+        try {
+            const url = `${AIRTABLE_API_URL}/${recordId}`; // Fetch a single record by its ID
+            const response = await fetch(url, { headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` } });
 
-// NEW: Logic to close the modal
-loadModalCloseBtn.addEventListener('click', () => {
-    loadDealModal.style.display = 'none';
+            if (!response.ok) {
+                const errorPayload = await response.json();
+                throw new Error(JSON.stringify(errorPayload));
+            }
+
+            const data = await response.json();
+            setFormData(data.fields); // Use our existing function to fill the form
+            alert(`Deal "${data.fields.opportunityName}" loaded successfully!`);
+            loadDealModal.style.display = 'none'; // Close the modal on success
+
+        } catch (error) {
+            console.error('Load Error:', error);
+            loadModalError.textContent = `Failed to load deal. ${error.message}`;
+        } finally {
+            loadSelectedDealBtn.textContent = 'Load Selected Deal';
+            loadSelectedDealBtn.disabled = false;
+        }
+    });
+
+    // Logic to close the modal
+    loadModalCloseBtn.addEventListener('click', () => {
+        loadDealModal.style.display = 'none';
+    });
+
+
+    // --- INITIALIZATION ---
+    handleBudgetCheckboxChange();
+    
 });

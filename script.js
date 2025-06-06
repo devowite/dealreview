@@ -78,27 +78,35 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const getFormData = () => {
-        const data = {};
-        const formData = new FormData(form);
+    const data = {};
+    const formData = new FormData(form);
 
-        for (let [key, value] of formData.entries()) {
-            if (key.endsWith('[]')) {
-                const arrayKey = key.slice(0, -2);
-                if (!data[arrayKey]) data[arrayKey] = [];
-                data[arrayKey].push(value);
-            } else {
-                data[key] = value;
-            }
+    for (let [key, value] of formData.entries()) {
+        if (key.endsWith('[]')) {
+            const arrayKey = key.slice(0, -2);
+            if (!data[arrayKey]) data[arrayKey] = [];
+            data[arrayKey].push(value);
+        } else {
+            data[key] = value;
         }
-        
-        document.querySelectorAll('#interactive-checklist input[type="checkbox"]').forEach(cb => {
-    if (cb.offsetParent !== null) {
-         data[cb.name] = cb.checked; // This correctly sends true or false
     }
-});
+    document.querySelectorAll('#interactive-checklist input[type="checkbox"]').forEach(cb => {
+        if (cb.offsetParent !== null) {
+            data[cb.name] = cb.checked ? 'Yes' : 'No';
+        }
+    });
 
-        return data;
-    };
+    // Fix: Parse number fields as numbers, not strings or empty
+    if ('screens' in data) {
+        data.screens = data.screens === '' ? null : Number(data.screens);
+    }
+    if ('arr' in data) {
+        data.arr = data.arr === '' ? null : Number(data.arr);
+    }
+    // Add similar lines for any other number fields
+
+    return data;
+};
     
     const setFormData = (data) => {
         form.reset(); 

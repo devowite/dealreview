@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Load Error:', error);
-            alert('Failed to load deal. Check console for details. Error: ${error.message}`);
+            alert(`Failed to load deal. Check console for details. Error: ${error.message}`);
         } finally {
             loadBtn.textContent = 'Load Deal';
             loadBtn.disabled = false;

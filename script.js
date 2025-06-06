@@ -97,18 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // **FIX ADDED HERE: Convert number fields from string to number**
-        const numericFields = ['screens', 'arr'];
-        numericFields.forEach(fieldName => {
-            if (data[fieldName] && data[fieldName] !== '') {
-                data[fieldName] = parseFloat(data[fieldName]);
-            } else {
-                // If the field is empty, delete it so we don't send an
-                // empty string to a number column in Airtable.
-                delete data[fieldName];
-            }
-        });
-
         return data;
     };
     
@@ -177,6 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         saveBtn.disabled = true;
 
         try {
+            // First, try to find an existing record to update
             const searchUrl = `${AIRTABLE_API_URL}?filterByFormula={opportunityName}="${opportunityName}"`;
             const searchRes = await fetch(searchUrl, { headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` } });
             
@@ -191,6 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let recordsPayload;
 
             if (searchData.records && searchData.records.length > 0) {
+                // Record exists, so we will UPDATE (PATCH) it
                 method = 'PATCH';
                 recordsPayload = {
                     records: [{
@@ -199,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }]
                 };
             } else {
+                // Record does not exist, so we will CREATE (POST) a new one
                 method = 'POST';
                 recordsPayload = {
                     records: [{
@@ -228,6 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     loadBtn.addEventListener('click', async () => {
+        // This function remains largely the same but with improved error handling
         const opportunityName = prompt("Enter the Opportunity Name to load:");
         if (!opportunityName) return;
         
@@ -257,13 +249,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Load Error:', error);
-            alert(`Failed to load deal. Check console for details. Error: ${error.message}`);
+            alert('Failed to load deal. Check console for details. Error: ${error.message}`);
         } finally {
             loadBtn.textContent = 'Load Deal';
             loadBtn.disabled = false;
         }
     });
     
+    // Analyze function remains unchanged
     analyzeBtn.addEventListener('click', async () => {
         const dealData = getFormData();
         if (!dealData.opportunityName) {

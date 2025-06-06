@@ -152,6 +152,10 @@ document.addEventListener('DOMContentLoaded', () => {
     saveBtn.addEventListener('click', async () => {
         const dealData = getFormData();
         const opportunityName = dealData.opportunityName;
+        
+        if (dealData.closeDate === '') delete dealData.closeDate;
+        if (dealData.arr === '') delete dealData.arr;
+        if (dealData.screens === '') delete dealData.screens;
 
         if (!opportunityName) {
             alert('Please enter an Opportunity Name before saving.');

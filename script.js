@@ -92,10 +92,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         document.querySelectorAll('#interactive-checklist input[type="checkbox"]').forEach(cb => {
-            if (cb.offsetParent !== null) {
-                 data[cb.name] = cb.checked ? 'Yes' : 'No';
-            }
-        });
+    if (cb.offsetParent !== null) {
+         data[cb.name] = cb.checked; // This correctly sends true or false
+    }
+});
 
         return data;
     };

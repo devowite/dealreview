@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
         analyzeBtn.disabled = true;
         aiResponseContainer.innerHTML = 'Thinking... Please wait.';
         modal.style.display = 'block';
-        const promptForAI = `Review the submitted information from the deal checklist and spotlight any potential weaknesses and/or missing information, what risks the missing information poses, and suggest how the information could be retrieved or improved.\n\nHere is the deal data:\n${JSON.stringify(dealData, null, 2)}`;
+        const promptForAI = `Review the submitted information and, in succint bullet points, call out areas that are weak and need more information or improvement. Don't be vague, give specific and helpful advice.\n\nHere is the deal data:\n${JSON.stringify(dealData, null, 2)}`;
         try {
             // The URL now points to our own secure function, not OpenAI
             // The secret key is GONE from the front-end code

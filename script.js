@@ -82,10 +82,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData(form);
 
         for (let [key, value] of formData.entries()) {
-            if (key.endsWith('[]')) {
-                const arrayKey = key.slice(0, -2);
-                if (!data[arrayKey]) data[arrayKey] = [];
-                data[arrayKey].push(value);
+         if (key.endsWith('[]')) {
+        // Since the Airtable field is ACTUALLY named with brackets, we use the full key.
+        if (!data[key]) data[key] = [];
+        data[key].push(value);
+            }
             } else {
                 data[key] = value;
             }
@@ -171,7 +172,16 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         dealData.screens = parseInt(dealData.screens, 10);
     }
-
+        
+    // Convert the 'path-to-close[]' array into a single text block for Airtable
+    if (dealData['path-to-close[]'] && Array.isArray(dealData['path-to-close[]'])) {
+        // Join the array into a single string, with each step on a new line,
+        // and filter out any empty steps the user might have accidentally added.
+        dealData['path-to-close[]'] = dealData['path-to-close[]']
+            .filter(step => step.trim() !== '')
+            .join('\n');
+    }
+        
         if (!opportunityName) {
             alert('Please enter an Opportunity Name before saving.');
             return;

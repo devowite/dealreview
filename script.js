@@ -81,16 +81,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = {};
         const formData = new FormData(form);
 
-        for (let [key, value] of formData.entries()) {
-         if (key.endsWith('[]')) {
+          for (let [key, value] of formData.entries()) {
+      if (key.endsWith('[]')) {
         // Since the Airtable field is ACTUALLY named with brackets, we use the full key.
         if (!data[key]) data[key] = [];
         data[key].push(value);
-            }
-            } else {
-                data[key] = value;
-            }
-        }
+      } else {
+        // This handles all other standard fields
+        data[key] = value;
+      }
+    }
         
         document.querySelectorAll('#interactive-checklist input[type="checkbox"]').forEach(cb => {
     if (cb.offsetParent !== null) {

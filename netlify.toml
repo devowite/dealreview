@@ -1,2 +1,5 @@
 [build.environment]
   PHP_VERSION = "8.3"
+
+[functions]
+  timeout = 25

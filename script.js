@@ -78,35 +78,27 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const getFormData = () => {
-    const data = {};
-    const formData = new FormData(form);
+        const data = {};
+        const formData = new FormData(form);
 
-    for (let [key, value] of formData.entries()) {
-        if (key.endsWith('[]')) {
-            const arrayKey = key.slice(0, -2);
-            if (!data[arrayKey]) data[arrayKey] = [];
-            data[arrayKey].push(value);
-        } else {
-            data[key] = value;
+        for (let [key, value] of formData.entries()) {
+            if (key.endsWith('[]')) {
+                const arrayKey = key.slice(0, -2);
+                if (!data[arrayKey]) data[arrayKey] = [];
+                data[arrayKey].push(value);
+            } else {
+                data[key] = value;
+            }
         }
+        
+        document.querySelectorAll('#interactive-checklist input[type="checkbox"]').forEach(cb => {
+    if (cb.offsetParent !== null) {
+         data[cb.name] = cb.checked; // This correctly sends true or false
     }
-    document.querySelectorAll('#interactive-checklist input[type="checkbox"]').forEach(cb => {
-        if (cb.offsetParent !== null) {
-            data[cb.name] = cb.checked ? 'Yes' : 'No';
-        }
-    });
+});
 
-    // Fix: Parse number fields as numbers, not strings or empty
-    if ('screens' in data) {
-        data.screens = data.screens === '' ? null : Number(data.screens);
-    }
-    if ('arr' in data) {
-        data.arr = data.arr === '' ? null : Number(data.arr);
-    }
-    // Add similar lines for any other number fields
-
-    return data;
-};
+        return data;
+    };
     
     const setFormData = (data) => {
         form.reset(); 
@@ -161,9 +153,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const dealData = getFormData();
         const opportunityName = dealData.opportunityName;
         
-        if (dealData.closeDate === '') delete dealData.closeDate;
-        if (dealData.arr === '') delete dealData.arr;
-        if (dealData.screens === '') delete dealData.screens;
+    // Clean up and format data for the API
+    if (dealData.closeDate === '') {
+        delete dealData.closeDate;
+    }
+
+    // For 'arr', delete if empty, otherwise convert to a number.
+    if (dealData.arr === '') {
+        delete dealData.arr;
+    } else {
+        dealData.arr = parseInt(dealData.arr, 10);
+    }
+
+    // For 'screens', delete if empty, otherwise convert to a number.
+    if (dealData.screens === '') {
+        delete dealData.screens;
+    } else {
+        dealData.screens = parseInt(dealData.screens, 10);
+    }
 
         if (!opportunityName) {
             alert('Please enter an Opportunity Name before saving.');

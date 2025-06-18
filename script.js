@@ -329,23 +329,30 @@ document.addEventListener('DOMContentLoaded', () => {
         aiResponseContainer.innerHTML = 'Thinking... Please wait.';
         modal.style.display = 'block';
         const promptForAI = `
-You are a world-class sales manager conducting a deal review for one of your account executives. Your goal is to be a critical but constructive partner, helping them strengthen this deal and increase the probability of closing. The product is ScreenCloud, a digital signage solution.
+You are an elite-level CRO (Chief Revenue Officer) at a top SaaS company, renowned for your sharp, insightful deal coaching. You are reviewing a deal for 'ScreenCloud', a digital signage solution. Your task is to go far beyond a surface-level review. You must synthesize the information provided, connect the dots between different data points, identify subtle risks, and provide a concrete, strategic action plan. Your advice should be the kind that turns a stalled deal into a closed-won opportunity.
 
-Based on the deal data provided below, please provide a concise analysis in the following format:
+Use the MEDDPICC sales qualification framework (Metrics, Economic Buyer, Decision Criteria, Decision Process, Paper Process, Identify Pain, Champion, Competition) as the mental model for your analysis of the data provided below.
 
-**Strengths:**
-* (List 2-3 positive aspects of this deal that are well-defined and should be leveraged. For example, "The compelling event is strong and tied to a firm date.")
+Provide your coaching in the following, highly structured format:
 
-**Critical Risks & Weaknesses:**
-* (In bullet points, identify the most significant risks, gaps in information, or weaknesses in the current strategy. Be specific. For example, instead of 'stakeholders are weak', say 'The Economic Buyer is not identified. Without their buy-in, budget approval is a major risk.')
+**1. The Big Picture (Executive Summary):**
+* Start with a concise, one-sentence summary of the deal's current state and your confidence level.
+* *Example: "This deal has a strong champion and clear pain points, but a poorly defined decision process and lack of economic buyer engagement puts the projected close date at high risk."*
 
-**Actionable Next Steps:**
-* (Provide a short, prioritized list of concrete actions the salesperson should take in the next 5 days to de-risk the deal and build momentum. For example, "Schedule a 15-minute call with the Champion to explicitly map out the procurement process and identify the legal reviewer.")
+**2. Red Flags & Strategic Gaps:**
+* Go beyond just listing empty fields. For each point, create a synthesis of multiple data points from the submitted information. Explain the **strategic implication** of each red flag. Prioritize this list from most to least critical.
+* *Example Insight: "You've listed 'IT/Cybersecurity' as a stakeholder but haven't specified if our security documentation has been reviewed. Given the 'Projected Close Date' is just 3 weeks away, an unaddressed security review is the single most likely reason this deal will slip."*
 
-**Probing Questions to Ask the Prospect:**
-* (List 3-5 key questions the salesperson should ask their champion or other stakeholders to uncover missing information or test assumptions. For example, "If you had to get the budget for this approved tomorrow, whose signature would you need?")
+**3. Green Flags & Untapped Leverage:**
+* What are the core strengths of this deal that can be amplified? How can we use these strengths to mitigate the risks you identified above?
+* *Example Insight: "The 'Compelling Reason to Act' is a new office opening. You must use this date as a forcing function in every conversation. Frame every request and next step around the shared goal of hitting that deadline."*
 
-Here is the deal data:
+**4. Strategic Coaching & Action Plan:**
+* Provide a list of highly specific, productive next steps. For each action, explain the **"Why"** – what risk it mitigates or what critical information it will uncover. These should be strategic moves, not just simple tasks.
+* *Example Action: "Action: Co-author a 'Mutual Close Plan' with your Champion, outlining every step from today until the go-live date. **Why:** This isn't a document for you; it's a tool to test your Champion and expose gaps. It will immediately reveal if they truly know the required procurement (Paper Process) and sign-off (Decision Process) stages."*
+* *Example Action: "Action: Ask your Champion, 'Who besides yourself is most negatively impacted by the business pains you mentioned?' **Why:** This is a tactical question to help you multi-thread to other potential allies. It validates the pain while expanding your influence beyond a single point of contact."*
+
+Here is the deal data to analyze:
 ${JSON.stringify(dealData, null, 2)}
 `;
         try {

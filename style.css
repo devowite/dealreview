@@ -1,39 +1,45 @@
 :root {
-    --primary-color: #007bff;
-    --primary-hover: #0056b3;
-    --background-color: #29216C;
-    --container-bg: #ffffff;
-    --text-color: #333;
-    --border-color: #dee2e6;
-    --input-bg: #fff;
-    --progress-bar-bg: #e9ecef;
-    --success-color: #28a745;
-    --warning-color: #ffc107;
-    --danger-color: #dc3545;
+    --primary-color: #4A90E2; /* A more modern, slightly softer blue */
+    --primary-hover: #357ABD;
+    --background-color: #F4F7FC; /* A very light, professional blue-gray */
+    --container-bg: #FFFFFF;
+    --text-color: #2D3748; /* A dark, soft gray instead of pure black */
+    --label-color: #4A5568;
+    --border-color: #E2E8F0;
+    --input-bg: #FFFFFF;
+    --input-focus-border: #4A90E2;
+    --input-focus-shadow: rgba(74, 144, 226, 0.2);
+    --progress-bar-bg: #E2E8F0;
+    --success-color: #48BB78;
+    --warning-color: #F6AD55;
+    --danger-color: #F56565;
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     background-color: var(--background-color);
     color: var(--text-color);
     margin: 0;
-    padding: 20px 20px 120px 20px; /* Added bottom padding for floating bar */
+    padding: 30px 20px 140px 20px; /* Added more bottom padding for the taller floating bar */
     line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .container {
     max-width: 900px;
     margin: 0 auto;
     background-color: var(--container-bg);
-    padding: 20px 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+    border: 1px solid var(--border-color);
 }
 
 header {
-    padding-bottom: 20px;
+    padding-bottom: 25px;
     border-bottom: 1px solid var(--border-color);
-    margin-bottom: 25px;
+    margin-bottom: 30px;
 }
 
 .header-content {
@@ -47,6 +53,7 @@ header {
 h1 {
     color: var(--text-color);
     font-weight: 700;
+    font-size: 1.8em;
     margin: 0;
 }
 
@@ -55,37 +62,45 @@ h1 {
     gap: 15px;
 }
 
-.top-action-buttons button {
+button, .action-buttons button, .top-action-buttons button {
     padding: 10px 20px;
     font-size: 0.95em;
     font-weight: 600;
-    border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.1s;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid transparent;
+}
+
+button:active, .action-buttons button:active, .top-action-buttons button:active {
+    transform: scale(0.97);
 }
 
 #save-deal-btn {
     background-color: var(--success-color);
     color: white;
+    border-color: var(--success-color);
 }
-#save-deal-btn:hover { background-color: #218838; }
+#save-deal-btn:hover { background-color: #38A169; }
 
 #load-deal-btn {
-    background-color: #6c757d;
+    background-color: var(--label-color);
     color: white;
+    border-color: var(--label-color);
 }
-#load-deal-btn:hover { background-color: #5a6268; }
+#load-deal-btn:hover { background-color: #2D3748; }
 
-/* --- Floating Progress Bar Styles --- */
 #floating-progress-bar {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: var(--container-bg);
-    padding: 15px 30px;
-    box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 20px 30px;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.08);
+    border-top: 1px solid var(--border-color);
     z-index: 999;
     box-sizing: border-box;
 }
@@ -93,10 +108,10 @@ h1 {
 .progress-bar-label {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 0.9em;
-    font-weight: 500;
-    color: #555;
+    margin-bottom: 12px;
+    font-size: 1em;
+    font-weight: 600;
+    color: var(--label-color);
     max-width: 900px;
     margin-left: auto;
     margin-right: auto;
@@ -111,10 +126,11 @@ h1 {
     background-color: var(--progress-bar-bg);
     border-radius: 20px;
     overflow: hidden;
-    height: 12px;
+    height: 16px;
     max-width: 900px;
     margin-left: auto;
     margin-right: auto;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .progress-bar-fill {
@@ -124,32 +140,33 @@ h1 {
     border-radius: 20px;
     transition: width 0.4s ease, background-color 0.4s ease;
 }
-/* --- End Floating Bar Styles --- */
 
 fieldset {
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 20px;
-    margin-bottom: 25px;
+    border: none;
+    border-top: 1px solid var(--border-color);
+    padding: 25px 0 0 0;
+    margin: 0 0 30px 0;
 }
 
 legend {
     font-weight: 600;
-    font-size: 1.2em;
-    padding: 0 10px;
-    color: var(--primary-color);
+    font-size: 1.3em;
+    padding: 0;
+    margin-left: -5px; /* Align with input fields */
+    margin-bottom: 10px;
+    color: var(--text-color);
 }
 
 .grid-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
+    gap: 25px;
 }
 
 .input-group {
     display: flex;
     flex-direction: column;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .input-group:last-child {
@@ -157,9 +174,10 @@ legend {
 }
 
 label {
-    margin-bottom: 6px;
-    font-weight: 500;
-    font-size: 0.95em;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 0.9em;
+    color: var(--label-color);
 }
 
 input[type="text"],
@@ -167,14 +185,15 @@ input[type="number"],
 input[type="date"],
 textarea {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border: 1px solid var(--border-color);
-    border-radius: 4px;
+    border-radius: 8px;
     background-color: var(--input-bg);
     font-family: 'Inter', sans-serif;
     font-size: 1em;
     box-sizing: border-box;
     transition: border-color 0.2s, box-shadow 0.2s;
+    color: var(--text-color);
 }
 
 input[type="text"]:focus,
@@ -182,32 +201,42 @@ input[type="number"]:focus,
 input[type="date"]:focus,
 textarea:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    border-color: var(--input-focus-border);
+    box-shadow: 0 0 0 3px var(--input-focus-shadow);
 }
 
 textarea {
     resize: vertical;
+    min-height: 80px;
 }
 
 .add-button {
-    background: none;
-    border: 1px dashed var(--primary-color);
+    background: var(--container-bg);
+    border: 1px dashed var(--border-color);
     color: var(--primary-color);
-    padding: 5px 10px;
-    border-radius: 4px;
+    padding: 8px 12px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 0.9em;
+    font-weight: 600;
     margin-top: 5px;
     align-self: flex-start;
+    transition: all 0.2s ease;
+}
+
+.add-button:hover {
+    background: #F4F7FC;
+    border-color: var(--primary-color);
 }
 
 #path-to-close-container .path-item {
-    margin-bottom: 5px;
+    margin-bottom: 8px;
 }
 
 .table-container {
     overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
 }
 
 table {
@@ -216,24 +245,38 @@ table {
 }
 
 th, td {
-    padding: 12px;
+    padding: 15px;
     text-align: left;
     border-bottom: 1px solid var(--border-color);
 }
 
+table tr:last-child td {
+    border-bottom: none;
+}
+
 th {
     font-weight: 600;
+    font-size: 0.9em;
+    color: var(--label-color);
+    background-color: #F8FAFC;
 }
 
 td input[type="text"] {
     width: 100%;
-    padding: 8px;
+    padding: 10px;
 }
 
 .checklist-item {
     display: flex;
     align-items: flex-start;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.checklist-item:hover {
+    background-color: #F8FAFC;
 }
 
 .checklist-item.with-text {
@@ -242,45 +285,35 @@ td input[type="text"] {
 
 .checklist-item.with-text textarea {
     width: 100%;
-    margin-top: 8px;
+    margin-top: 12px;
+    background-color: #F8FAFC;
 }
 
 .checklist-item label {
     display: flex;
     align-items: center;
-    font-weight: 400;
+    font-weight: 500;
+    color: var(--text-color);
     cursor: pointer;
 }
 
 .checklist-item input[type="checkbox"] {
-    margin-right: 12px;
-    width: 18px;
-    height: 18px;
+    margin-right: 15px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
     accent-color: var(--primary-color);
+    cursor: pointer;
+    margin-top: 2px;
 }
 
 .action-buttons {
     display: flex;
     justify-content: flex-end;
     gap: 15px;
-    margin-top: 20px;
-    padding-top: 20px;
+    margin-top: 30px;
+    padding-top: 30px;
     border-top: 1px solid var(--border-color);
-}
-
-.action-buttons button {
-    padding: 12px 25px;
-    font-size: 1em;
-    font-weight: 600;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.1s;
-}
-
-.action-buttons button:active {
-    transform: scale(0.98);
 }
 
 #analyze-deal-btn {
@@ -299,26 +332,41 @@ td input[type="text"] {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0,0,0,0.6);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .modal-content {
     background-color: var(--container-bg);
-    margin: 10% auto;
-    padding: 30px;
-    border-radius: 8px;
-    width: 80%;
+    margin: 8% auto;
+    padding: 40px;
+    border-radius: 12px;
+    width: 90%;
     max-width: 700px;
     position: relative;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    animation: slideIn 0.4s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
 .close-button {
     color: #aaa;
-    float: right;
-    font-size: 28px;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 32px;
     font-weight: bold;
     cursor: pointer;
+    transition: color 0.2s ease;
 }
 
 .close-button:hover {
@@ -327,21 +375,23 @@ td input[type="text"] {
 
 #ai-response {
     margin-top: 20px;
-    white-space: pre-wrap;
-    max-height: 50vh;
+    white-space: pre-wrap; /* Keeps formatting */
+    max-height: 60vh;
     overflow-y: auto;
-    background-color: var(--background-color);
-    padding: 15px;
-    border-radius: 5px;
+    background-color: #F8FAFC;
+    color: var(--text-color);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    line-height: 1.7;
 }
 
-/* Styles for the new Load Deal Modal */
 #load-deal-select {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
+    padding: 12px;
+    margin-bottom: 20px;
     border: 1px solid var(--border-color);
-    border-radius: 4px;
+    border-radius: 8px;
     background-color: var(--input-bg);
     font-family: 'Inter', sans-serif;
     font-size: 1em;
@@ -352,8 +402,7 @@ td input[type="text"] {
     padding: 12px 25px;
     font-size: 1em;
     font-weight: 600;
-    border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
     background-color: var(--primary-color);
     color: white;
@@ -362,4 +411,9 @@ td input[type="text"] {
 
 #load-selected-deal-btn:hover {
     background-color: var(--primary-hover);
+}
+#load-modal-error {
+    color: var(--danger-color);
+    margin-top: 15px;
+    font-weight: 500;
 }

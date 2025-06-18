@@ -328,7 +328,26 @@ document.addEventListener('DOMContentLoaded', () => {
         analyzeBtn.disabled = true;
         aiResponseContainer.innerHTML = 'Thinking... Please wait.';
         modal.style.display = 'block';
-        const promptForAI = `Review the submitted information and, in succint bullet points, call out areas that are weak and need more information or improvement. Don't be vague, give specific and helpful advice.\n\nHere is the deal data:\n${JSON.stringify(dealData, null, 2)}`;
+        const promptForAI = `
+You are a world-class sales manager conducting a deal review for one of your account executives. Your goal is to be a critical but constructive partner, helping them strengthen this deal and increase the probability of closing. The product is ScreenCloud, a digital signage solution.
+
+Based on the deal data provided below, please provide a concise analysis in the following format:
+
+**Strengths:**
+* (List 2-3 positive aspects of this deal that are well-defined and should be leveraged. For example, "The compelling event is strong and tied to a firm date.")
+
+**Critical Risks & Weaknesses:**
+* (In bullet points, identify the most significant risks, gaps in information, or weaknesses in the current strategy. Be specific. For example, instead of 'stakeholders are weak', say 'The Economic Buyer is not identified. Without their buy-in, budget approval is a major risk.')
+
+**Actionable Next Steps:**
+* (Provide a short, prioritized list of concrete actions the salesperson should take in the next 5 days to de-risk the deal and build momentum. For example, "Schedule a 15-minute call with the Champion to explicitly map out the procurement process and identify the legal reviewer.")
+
+**Probing Questions to Ask the Prospect:**
+* (List 3-5 key questions the salesperson should ask their champion or other stakeholders to uncover missing information or test assumptions. For example, "If you had to get the budget for this approved tomorrow, whose signature would you need?")
+
+Here is the deal data:
+${JSON.stringify(dealData, null, 2)}
+`;
         try {
             // The URL now points to our own secure function, not OpenAI
             // The secret key is GONE from the front-end code

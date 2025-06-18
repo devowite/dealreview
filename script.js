@@ -108,30 +108,53 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const setFormData = (data) => {
-        form.reset(); 
+        form.reset();
+        pathToCloseContainer.innerHTML = ''; // Clear path steps initially
+
         for (const key in data) {
-            const element = form.elements[key];
-            if (element) {
-                if (element.type === 'checkbox') {
-                    element.checked = data[key] === true || data[key] === 'Yes';
-                } else {
-                    element.value = data[key];
+            if (key === 'path-to-close[]') {
+                // This is our special case for the multi-step input
+                if (data[key] && typeof data[key] === 'string') {
+                    const steps = data[key].split('\n');
+                    steps.forEach(step => {
+                        if (step.trim() !== '') {
+                            const div = document.createElement('div');
+                            div.className = 'path-item';
+                            const input = document.createElement('input');
+                            input.type = 'text';
+                            input.name = 'path-to-close[]';
+                            input.value = step; // Safely setting the value
+                            div.appendChild(input);
+                            pathToCloseContainer.appendChild(div);
+                        }
+                    });
                 }
-            } else if (key === 'path-to-close[]' && data[key]) {
-                // To properly load from a text block, we split it back into an array
-                const steps = data[key].split('\n');
-                pathToCloseContainer.innerHTML = '';
-                steps.forEach(step => {
-                    if (step) {
-                        const div = document.createElement('div');
-                        div.className = 'path-item';
-                        div.innerHTML = `<input type="text" name="path-to-close[]" value="${step}">`;
-                        pathToCloseContainer.appendChild(div);
+            } else {
+                // This handles all other standard fields
+                const element = form.elements[key];
+                if (element) {
+                    // Check if it's a NodeList (like for radio buttons), though we don't have them here
+                    if (element.length && !element.tagName) {
+                         // Logic for radio button group would go here if needed
+                    } else if (element.type === 'checkbox') {
+                        element.checked = data[key] === true || data[key] === 'Yes';
+                    } else {
+                        element.value = data[key];
                     }
-                });
+                }
             }
         }
+
+        // If there were no path steps in the data, add a default empty one
+        if (pathToCloseContainer.children.length === 0) {
+             const div = document.createElement('div');
+             div.className = 'path-item';
+             div.innerHTML = `<input type="text" name="path-to-close[]" placeholder="Enter a step...">`;
+             pathToCloseContainer.appendChild(div);
+        }
+
         handleBudgetCheckboxChange();
+        updateProgress(); // Also call updateProgress after loading data
     };
 
     // --- EVENT LISTENERS ---

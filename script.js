@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const stakeholderCanvas = document.getElementById('stakeholder-canvas');
     const lineCanvas = document.getElementById('line-canvas');
     const addStakeholderBtn = document.getElementById('add-stakeholder-btn');
+    const toggleControlsBtn = document.getElementById('toggle-controls-btn');
 
     // --- STAKEHOLDER MAP STATE & FUNCTIONS ---
     let stakeholderMapData = { nodes: [], links: [] };
@@ -165,41 +166,45 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const drawLines = () => {
-        lineCanvas.innerHTML = '';
-        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-        defs.innerHTML = `
-            <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5"
-                markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#888"></path>
-            </marker>
-        `;
-        lineCanvas.appendChild(defs);
+    lineCanvas.innerHTML = ''; // Clear old lines
 
-        stakeholderMapData.links.forEach(link => {
-            const sourceNodeEl = document.getElementById(`node-${link.source}`);
-            const targetNodeEl = document.getElementById(`node-${link.target}`);
-            if (!sourceNodeEl || !targetNodeEl) return;
+    // Define an arrowhead marker
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    // FIX: Added a fill attribute to the path to make the arrowhead visible
+    defs.innerHTML = `
+        <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5"
+            markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#888"></path>
+        </marker>
+    `;
+    lineCanvas.appendChild(defs);
 
-            const sourceRect = sourceNodeEl.getBoundingClientRect();
-            const targetRect = targetNodeEl.getBoundingClientRect();
-            const canvasRect = stakeholderCanvas.getBoundingClientRect();
+    stakeholderMapData.links.forEach(link => {
+        const sourceNodeEl = document.getElementById(`node-${link.source}`);
+        const targetNodeEl = document.getElementById(`node-${link.target}`);
 
-            const x1 = (sourceRect.left - canvasRect.left) + (sourceRect.width / 2);
-            const y1 = (sourceRect.top - canvasRect.top) + (sourceRect.height / 2);
-            const x2 = (targetRect.left - canvasRect.left) + (targetRect.width / 2);
-            const y2 = (targetRect.top - canvasRect.top) + (targetRect.height / 2);
+        if (!sourceNodeEl || !targetNodeEl) return;
 
-            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', x1);
-            line.setAttribute('y1', y1);
-            line.setAttribute('x2', x2);
-            line.setAttribute('y2', y2);
-            line.setAttribute('stroke', '#888');
-            line.setAttribute('stroke-width', '2');
-            line.setAttribute('marker-end', 'url(#arrowhead)');
-            lineCanvas.appendChild(line);
-        });
-    }
+        const sourceRect = sourceNodeEl.getBoundingClientRect();
+        const targetRect = targetNodeEl.getBoundingClientRect();
+        const canvasRect = stakeholderCanvas.getBoundingClientRect();
+
+        const x1 = (sourceRect.left - canvasRect.left) + (sourceRect.width / 2);
+        const y1 = (sourceRect.top - canvasRect.top) + (sourceRect.height / 2);
+        const x2 = (targetRect.left - canvasRect.left) + (targetRect.width / 2);
+        const y2 = (targetRect.top - canvasRect.top) + (targetRect.height / 2);
+
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x1);
+        line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2);
+        line.setAttribute('y2', y2);
+        line.setAttribute('stroke', '#888');
+        line.setAttribute('stroke-width', '2');
+        line.setAttribute('marker-end', 'url(#arrowhead)');
+        lineCanvas.appendChild(line);
+    });
+};
 
     // --- Drag and Drop Logic ---
     const onDragStart = (e) => {
@@ -649,6 +654,10 @@ document.addEventListener('DOMContentLoaded', () => {
         titleInput.value = '';
         renderStakeholderMap();
     });
+
+    toggleControlsBtn.addEventListener('click', () => {
+    stakeholderCanvas.classList.toggle('controls-hidden');
+});
 
     loadSelectedDealBtn.addEventListener('click', async () => {
         const recordId = loadDealSelect.value;

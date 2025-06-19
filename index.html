@@ -283,13 +283,19 @@
                 <input type="text" id="new-stakeholder-name" placeholder="Stakeholder Name">
                 <input type="text" id="new-stakeholder-title" placeholder="Title/Role">
                 <button type="button" id="add-stakeholder-btn">Add Stakeholder</button>
-                <button type="button" id="toggle-controls-btn" style="margin-left: auto;">Toggle Controls</button>
             </div>
 
             <div id="stakeholder-canvas-wrapper">
                 <div id="stakeholder-canvas">
                 </div>
-                 <svg id="line-canvas"></svg>
+                 <svg id="line-canvas">
+                     <defs>
+                        <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5"
+                            markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                              <path d="M 0 0 L 10 5 L 0 10 z" fill="#888"></path>
+                                </marker>
+                        </defs>
+                 </svg>
             </div>
         </div>
     </div>

@@ -53,6 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- STAKEHOLDER MAP STATE & FUNCTIONS ---
 let stakeholderMapData = { nodes: [], links: [] };
+let isSelectingManager = false;
+let sourceNodeForLink = null;
 let activeNode = null;
 let offsetX, offsetY;
 
@@ -78,10 +80,11 @@ const createNodeElement = (nodeData) => {
     nodeEl.id = `node-${nodeData.id}`;
     nodeEl.style.left = `${nodeData.x}px`;
     nodeEl.style.top = `${nodeData.y}px`;
-    const size = 60 + (nodeData.influence * 15); // Base size + influence increment
+    const size = 60 + (nodeData.influence * 15);
     nodeEl.style.width = `${size}px`;
     nodeEl.style.height = `${size}px`;
 
+    // --- We've changed the button text and the function it calls ---
     nodeEl.innerHTML = `
         <div class="node-menu">
             <span onclick="updateSupport('${nodeData.id}', 'supporter')">S</span>
@@ -94,10 +97,15 @@ const createNodeElement = (nodeData) => {
         <div class="node-controls">
             <span class="influence-control" onclick="updateInfluence('${nodeData.id}', -1)">&#9660;</span>
             <span class="influence-control" onclick="updateInfluence('${nodeData.id}', 1)">&#9650;</span>
-            <span class="add-manager-btn" onclick="addManager('${nodeData.id}')">+ Manager</span>
+            <span class="add-manager-btn" onclick="initiateReportsTo('${nodeData.id}')">Reports To</span>
         </div>
     `;
-    
+
+    // Add a single click handler for managing the "Reports To" logic
+    nodeEl.addEventListener('click', (e) => {
+        handleNodeClick(e.currentTarget.id.replace('node-', ''));
+    });
+
     nodeEl.addEventListener('mousedown', onDragStart);
     stakeholderCanvas.appendChild(nodeEl);
 };
@@ -119,38 +127,44 @@ window.updateSupport = (nodeId, newSupport) => {
     }
 };
 
-window.addManager = (nodeId) => {
-    const managerName = prompt("Enter manager's name:");
-    if (!managerName || managerName.trim() === '') return;
-    const managerTitle = prompt("Enter manager's title:");
+const initiateReportsTo = (nodeId) => {
+    isSelectingManager = true;
+    sourceNodeForLink = nodeId;
+    stakeholderCanvas.style.cursor = 'crosshair';
+    alert(`Selecting manager for this node. Click another stakeholder who this person reports to.`);
+    // You could also add a class to the body here for more distinct visual feedback
+};
 
-    const childNode = stakeholderMapData.nodes.find(n => n.id == nodeId);
-    const newId = Date.now().toString();
+const handleNodeClick = (clickedNodeId) => {
+    // This function only runs if we are in "select manager" mode
+    if (!isSelectingManager) return;
 
-    const newNode = {
-        id: newId,
-        name: managerName,
-        title: managerTitle,
-        support: 'neutral',
-        influence: 1,
-        x: childNode.x,
-        y: childNode.y - 150 // Position new manager above
-    };
-    stakeholderMapData.nodes.push(newNode);
+    // Prevent a node from reporting to itself
+    if (sourceNodeForLink === clickedNodeId) {
+        alert("A stakeholder cannot report to themselves.");
+        return;
+    }
+    
+    // Create the link
+    stakeholderMapData.links.push({ source: sourceNodeForLink, target: clickedNodeId });
 
-   // --- THIS IS THE KEY ADDITION ---
-    // Create a link from the child (source) to the new manager (target)
-    stakeholderMapData.links.push({ source: childNodeId, target: newId });
-    // -------------------------------
-
-    renderStakeholderMap(); // This will now also draw the new line
+    // Reset the selection state
+    isSelectingManager = false;
+    sourceNodeForLink = null;
+    stakeholderCanvas.style.cursor = 'default';
+    
+    // Redraw the map to show the new line
+    renderStakeholderMap();
 };
 
 window.removeNode = (nodeId) => {
     if(confirm('Are you sure you want to remove this stakeholder?')) {
+        // Remove the node itself
         stakeholderMapData.nodes = stakeholderMapData.nodes.filter(n => n.id != nodeId);
-        // Also remove any links associated with this node
-        // stakeholderMapData.links = stakeholderMapData.links.filter(l => l.source != nodeId && l.target != nodeId);
+        
+        // --- This new part removes any connections to the deleted node ---
+        stakeholderMapData.links = stakeholderMapData.links.filter(l => l.source != nodeId && l.target != nodeId);
+        
         renderStakeholderMap();
     }
 }

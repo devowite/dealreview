@@ -42,6 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const quickViewModalCloseBtn = document.getElementById('quick-view-modal-close-btn');
     const quickViewContent = document.getElementById('quick-view-content');
 
+    const showGapsBtn = document.getElementById('show-gaps-btn');
+
     // --- CORE FUNCTIONS ---
     const updateProgress = () => {
         const visibleFields = allProgressFields.filter(field => field.offsetParent !== null);
@@ -401,6 +403,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
     quickViewModalCloseBtn.addEventListener('click', () => {
     quickViewModal.style.display = 'none';
+});
+
+    showGapsBtn.addEventListener('click', () => {
+    const isActive = showGapsBtn.dataset.active === 'true';
+
+    // Get all currently visible fields
+    const visibleFields = allProgressFields.filter(field => field.offsetParent !== null);
+
+    if (isActive) {
+        // If active, turn it off and remove all highlights
+        showGapsBtn.textContent = 'Show Gaps';
+        showGapsBtn.dataset.active = 'false';
+        showGapsBtn.style.backgroundColor = 'var(--warning-color)';
+        
+        // Remove the class from any element that has it
+        const highlightedElements = form.querySelectorAll('.highlight-gap');
+        highlightedElements.forEach(el => el.classList.remove('highlight-gap'));
+
+    } else {
+        // If inactive, turn it on and add highlights
+        showGapsBtn.textContent = 'Hide Gaps';
+        showGapsBtn.dataset.active = 'true';
+        showGapsBtn.style.backgroundColor = '#2D3748'; // Darker color when active
+
+        visibleFields.forEach(field => {
+            let isGap = false;
+            let elementToHighlight = field;
+
+            if (field.type === 'checkbox') {
+                if (!field.checked) {
+                    isGap = true;
+                    // For checkboxes, highlight the parent container for better visibility
+                    const parentItem = field.closest('.checklist-item');
+                    if(parentItem) elementToHighlight = parentItem;
+                }
+            } else {
+                if (!field.value || field.value.trim() === '') {
+                    isGap = true;
+                }
+            }
+            
+            if (isGap) {
+                elementToHighlight.classList.add('highlight-gap');
+            }
+        });
+    }
 });
     
     analyzeBtn.addEventListener('click', async () => {

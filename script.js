@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="node-controls">
                 <span class="influence-control" data-action="influence" data-value="-1">&#9660;</span>
                 <span class="influence-control" data-action="influence" data-value="1">&#9650;</span>
-                <span class="add-manager-btn" data-action="reports-to">Reports To</span>
+                <span class="add-manager-btn" data-action="reports-to">Connect</span>
             </div>
         `;
 

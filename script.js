@@ -44,6 +44,205 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const showGapsBtn = document.getElementById('show-gaps-btn');
 
+    const stakeholderMapBtn = document.getElementById('stakeholder-map-btn');
+    const stakeholderMapModal = document.getElementById('stakeholder-map-modal');
+    const stakeholderMapCloseBtn = document.getElementById('stakeholder-map-close-btn');
+    const stakeholderCanvas = document.getElementById('stakeholder-canvas');
+    const lineCanvas = document.getElementById('line-canvas');
+    const addStakeholderBtn = document.getElementById('add-stakeholder-btn');
+
+// --- STAKEHOLDER MAP STATE & FUNCTIONS ---
+let stakeholderMapData = { nodes: [], links: [] };
+let activeNode = null;
+let offsetX, offsetY;
+
+// Function to render the entire map from data
+const renderStakeholderMap = () => {
+    stakeholderCanvas.innerHTML = ''; // Clear canvas
+    lineCanvas.innerHTML = ''; // Clear lines
+
+    stakeholderMapData.nodes.forEach(nodeData => {
+        createNodeElement(nodeData);
+    });
+    
+    // --- ADD THIS LINE ---
+    // Use a timeout to ensure nodes are in the DOM before drawing lines
+    setTimeout(drawLines, 0);
+    // ---------------------
+};
+
+// Function to create and append a single stakeholder node
+const createNodeElement = (nodeData) => {
+    const nodeEl = document.createElement('div');
+    nodeEl.className = `stakeholder-node ${nodeData.support}`;
+    nodeEl.id = `node-${nodeData.id}`;
+    nodeEl.style.left = `${nodeData.x}px`;
+    nodeEl.style.top = `${nodeData.y}px`;
+    const size = 60 + (nodeData.influence * 15); // Base size + influence increment
+    nodeEl.style.width = `${size}px`;
+    nodeEl.style.height = `${size}px`;
+
+    nodeEl.innerHTML = `
+        <div class="node-menu">
+            <span onclick="updateSupport('${nodeData.id}', 'supporter')">S</span>
+            <span onclick="updateSupport('${nodeData.id}', 'neutral')">N</span>
+            <span onclick="updateSupport('${nodeData.id}', 'detractor')">D</span>
+            <span onclick="removeNode('${nodeData.id}')">&#10006;</span>
+        </div>
+        <div class="node-name">${nodeData.name}</div>
+        <div class="node-title">${nodeData.title}</div>
+        <div class="node-controls">
+            <span class="influence-control" onclick="updateInfluence('${nodeData.id}', -1)">&#9660;</span>
+            <span class="influence-control" onclick="updateInfluence('${nodeData.id}', 1)">&#9650;</span>
+            <span class="add-manager-btn" onclick="addManager('${nodeData.id}')">+ Manager</span>
+        </div>
+    `;
+    
+    nodeEl.addEventListener('mousedown', onDragStart);
+    stakeholderCanvas.appendChild(nodeEl);
+};
+
+// --- Node Interaction Functions (must be global for onclick) ---
+window.updateInfluence = (nodeId, change) => {
+    const node = stakeholderMapData.nodes.find(n => n.id == nodeId);
+    if (node) {
+        node.influence = Math.max(0, node.influence + change); // Prevent negative influence
+        renderStakeholderMap();
+    }
+};
+
+window.updateSupport = (nodeId, newSupport) => {
+    const node = stakeholderMapData.nodes.find(n => n.id == nodeId);
+    if (node) {
+        node.support = newSupport;
+        renderStakeholderMap();
+    }
+};
+
+window.addManager = (nodeId) => {
+    const managerName = prompt("Enter manager's name:");
+    if (!managerName || managerName.trim() === '') return;
+    const managerTitle = prompt("Enter manager's title:");
+
+    const childNode = stakeholderMapData.nodes.find(n => n.id == nodeId);
+    const newId = Date.now().toString();
+
+    const newNode = {
+        id: newId,
+        name: managerName,
+        title: managerTitle,
+        support: 'neutral',
+        influence: 1,
+        x: childNode.x,
+        y: childNode.y - 150 // Position new manager above
+    };
+    stakeholderMapData.nodes.push(newNode);
+
+   // --- THIS IS THE KEY ADDITION ---
+    // Create a link from the child (source) to the new manager (target)
+    stakeholderMapData.links.push({ source: childNodeId, target: newId });
+    // -------------------------------
+
+    renderStakeholderMap(); // This will now also draw the new line
+};
+
+window.removeNode = (nodeId) => {
+    if(confirm('Are you sure you want to remove this stakeholder?')) {
+        stakeholderMapData.nodes = stakeholderMapData.nodes.filter(n => n.id != nodeId);
+        // Also remove any links associated with this node
+        // stakeholderMapData.links = stakeholderMapData.links.filter(l => l.source != nodeId && l.target != nodeId);
+        renderStakeholderMap();
+    }
+}
+
+    const drawLines = () => {
+    lineCanvas.innerHTML = ''; // Clear old lines
+
+    // Define an arrowhead marker
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    defs.innerHTML = `
+        <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5"
+            markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#888"></path>
+        </marker>
+    `;
+    lineCanvas.appendChild(defs);
+
+    stakeholderMapData.links.forEach(link => {
+        const sourceNodeEl = document.getElementById(`node-${link.source}`);
+        const targetNodeEl = document.getElementById(`node-${link.target}`);
+
+        if (!sourceNodeEl || !targetNodeEl) return;
+
+        const sourceRect = sourceNodeEl.getBoundingClientRect();
+        const targetRect = targetNodeEl.getBoundingClientRect();
+        const canvasRect = stakeholderCanvas.getBoundingClientRect();
+
+        // Calculate center points relative to the canvas
+        const x1 = (sourceRect.left - canvasRect.left) + (sourceRect.width / 2);
+        const y1 = (sourceRect.top - canvasRect.top) + (sourceRect.height / 2);
+        const x2 = (targetRect.left - canvasRect.left) + (targetRect.width / 2);
+        const y2 = (targetRect.top - canvasRect.top) + (targetRect.height / 2);
+
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x1);
+        line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2);
+        line.setAttribute('y2', y2);
+        line.setAttribute('stroke', '#888');
+        line.setAttribute('stroke-width', '2');
+        line.setAttribute('marker-end', 'url(#arrowhead)');
+        lineCanvas.appendChild(line);
+    });
+}
+
+// --- Drag and Drop Logic ---
+const onDragStart = (e) => {
+    if (e.target.classList.contains('influence-control') || e.target.classList.contains('add-manager-btn') || e.target.closest('.node-menu')) {
+        return; // Don't drag if clicking controls
+    }
+    e.preventDefault();
+    activeNode = e.currentTarget;
+    offsetX = e.clientX - activeNode.getBoundingClientRect().left;
+    offsetY = e.clientY - activeNode.getBoundingClientRect().top;
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', onDragEnd);
+};
+
+const onDrag = (e) => {
+    if (!activeNode) return;
+    const canvasRect = stakeholderCanvas.getBoundingClientRect();
+    let x = e.clientX - canvasRect.left - offsetX;
+    let y = e.clientY - canvasRect.top - offsetY;
+
+    // Clamp position within the canvas
+    x = Math.max(0, Math.min(x, stakeholderCanvas.clientWidth - activeNode.clientWidth));
+    y = Math.max(0, Math.min(y, stakeholderCanvas.clientHeight - activeNode.clientHeight));
+
+    activeNode.style.left = `${x}px`;
+    activeNode.style.top = `${y}px`;
+
+    // --- ADD THIS LINE ---
+    // Redraw lines as the node moves for a live update
+    drawLines();
+    // ---------------------
+};
+
+const onDragEnd = () => {
+    if (!activeNode) return;
+    const nodeId = activeNode.id.replace('node-', '');
+    const nodeData = stakeholderMapData.nodes.find(n => n.id == nodeId);
+    if(nodeData) {
+        nodeData.x = parseInt(activeNode.style.left, 10);
+        nodeData.y = parseInt(activeNode.style.top, 10);
+    }
+    activeNode = null;
+    document.removeEventListener('mousemove', onDrag);
+    document.removeEventListener('mouseup', onDragEnd);
+};
+
+
+    
     // --- CORE FUNCTIONS ---
     const updateProgress = () => {
         const visibleFields = allProgressFields.filter(field => field.offsetParent !== null);
@@ -111,58 +310,82 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+          // --- ADD THIS LINE ---
+            // Stringify the map data to save it as a text field in Airtable
+            data.stakeholderMapData = JSON.stringify(stakeholderMapData);
+            // ---------------------
+
+
         return data;
     };
     
     const setFormData = (data) => {
-        form.reset();
-        pathToCloseContainer.innerHTML = ''; // Clear path steps initially
+    form.reset();
+    pathToCloseContainer.innerHTML = ''; // Clear path steps initially
 
-        for (const key in data) {
-            if (key === 'path-to-close[]') {
-                // This is our special case for the multi-step input
-                if (data[key] && typeof data[key] === 'string') {
-                    const steps = data[key].split('\n');
-                    steps.forEach(step => {
-                        if (step.trim() !== '') {
-                            const div = document.createElement('div');
-                            div.className = 'path-item';
-                            const input = document.createElement('input');
-                            input.type = 'text';
-                            input.name = 'path-to-close[]';
-                            input.value = step; // Safely setting the value
-                            div.appendChild(input);
-                            pathToCloseContainer.appendChild(div);
-                        }
-                    });
-                }
-            } else {
-                // This handles all other standard fields
-                const element = form.elements[key];
-                if (element) {
-                    // Check if it's a NodeList (like for radio buttons), though we don't have them here
-                    if (element.length && !element.tagName) {
-                         // Logic for radio button group would go here if needed
-                    } else if (element.type === 'checkbox') {
-                        element.checked = data[key] === true || data[key] === 'Yes';
-                    } else {
-                        element.value = data[key];
+    // Reset and load the stakeholder map data
+    if (data.stakeholderMapData && data.stakeholderMapData.trim() !== '') {
+        try {
+            // Parse the stored string back into our map object
+            stakeholderMapData = JSON.parse(data.stakeholderMapData);
+        } catch (e) {
+            console.error("Could not parse stakeholder map data:", e);
+            // If data is corrupt or invalid, reset to a blank state
+            stakeholderMapData = { nodes: [], links: [] };
+        }
+    } else {
+        // If no map data exists for this deal, reset to a blank state
+        stakeholderMapData = { nodes: [], links: [] };
+    }
+
+    for (const key in data) {
+        if (key === 'path-to-close[]') {
+            // This is our special case for the multi-step input
+            if (data[key] && typeof data[key] === 'string') {
+                const steps = data[key].split('\n');
+                steps.forEach(step => {
+                    if (step.trim() !== '') {
+                        const div = document.createElement('div');
+                        div.className = 'path-item';
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.name = 'path-to-close[]';
+                        input.value = step; // Safely setting the value
+                        div.appendChild(input);
+                        pathToCloseContainer.appendChild(div);
                     }
+                });
+            }
+        } else if (key === 'stakeholderMapData') {
+            // We have already handled this new field above, so we'll just skip it in this loop.
+            continue;
+        } else {
+            // This handles all other standard fields
+            const element = form.elements[key];
+            if (element) {
+                // Check if it's a NodeList (like for radio buttons), though we don't have them here
+                if (element.length && !element.tagName) {
+                     // Logic for radio button group would go here if needed
+                } else if (element.type === 'checkbox') {
+                    element.checked = data[key] === true || data[key] === 'Yes';
+                } else {
+                    element.value = data[key];
                 }
             }
         }
+    }
 
-        // If there were no path steps in the data, add a default empty one
-        if (pathToCloseContainer.children.length === 0) {
-             const div = document.createElement('div');
-             div.className = 'path-item';
-             div.innerHTML = `<input type="text" name="path-to-close[]" placeholder="Enter a step...">`;
-             pathToCloseContainer.appendChild(div);
-        }
+    // If there were no path steps in the data, add a default empty one
+    if (pathToCloseContainer.children.length === 0) {
+         const div = document.createElement('div');
+         div.className = 'path-item';
+         div.innerHTML = `<input type="text" name="path-to-close[]" placeholder="Enter a step...">`;
+         pathToCloseContainer.appendChild(div);
+    }
 
-        handleBudgetCheckboxChange();
-        updateProgress(); // Also call updateProgress after loading data
-    };
+    handleBudgetCheckboxChange();
+    updateProgress(); // Also call updateProgress after loading data
+};
 
     // --- EVENT LISTENERS ---
     form.addEventListener('input', (event) => {
@@ -514,6 +737,44 @@ ${JSON.stringify(dealData, null, 2)}
             analyzeBtn.disabled = false;
         }
     });
+
+    // --- Stakeholder Map Event Listeners ---
+stakeholderMapBtn.addEventListener('click', () => {
+    stakeholderMapModal.style.display = 'block';
+    renderStakeholderMap(); // Re-render in case data was loaded
+});
+
+stakeholderMapCloseBtn.addEventListener('click', () => {
+    stakeholderMapModal.style.display = 'none';
+});
+
+addStakeholderBtn.addEventListener('click', () => {
+    const nameInput = document.getElementById('new-stakeholder-name');
+    const titleInput = document.getElementById('new-stakeholder-title');
+
+    if (nameInput.value.trim() === '') {
+        alert('Please enter a name.');
+        return;
+    }
+
+    const newNode = {
+        id: Date.now().toString(),
+        name: nameInput.value.trim(),
+        title: titleInput.value.trim(),
+        support: 'neutral',
+        influence: 1,
+        x: 50,
+        y: 50
+    };
+
+    stakeholderMapData.nodes.push(newNode);
+    nameInput.value = '';
+    titleInput.value = '';
+    renderStakeholderMap();
+});
+
+// NOTE: You will need to update your save/load functions to handle the 'stakeholderMapData'
+// by stringifying it to a new field in Airtable and parsing it back on load.
 
     // --- LOGIC FOR THE LOAD DEAL MODAL ---
     // MOVED TO BE INSIDE THE DOMCONTENTLOADED WRAPPER

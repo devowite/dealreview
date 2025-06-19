@@ -655,34 +655,62 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     analyzeBtn.addEventListener('click', async () => {
-        const dealData = getFormData();
-        if (!dealData.opportunityName) {
-            alert('Please fill out at least the Opportunity Name before analyzing.');
-            return;
-        }
-        analyzeBtn.textContent = 'Analyzing...';
-        analyzeBtn.disabled = true;
-        aiResponseContainer.innerHTML = 'Thinking... Please wait.';
-        modal.style.display = 'block';
-        const promptForAI = `...`; // Prompt removed for brevity
-        try {
-            const response = await fetch('/.netlify/functions/analyze-deal', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ promptForAI: promptForAI })
-            });
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.error || 'The analysis failed.');
-            aiResponseContainer.textContent = result.choices[0].message.content;
-        } catch (error) {
-            console.error('AI Analysis Error:', error);
-            aiResponseContainer.textContent = `An error occurred. Error: ${error.message}`;
-        } finally {
-            analyzeBtn.textContent = 'Let AI Analyze';
-            analyzeBtn.disabled = false;
-        }
-    });
+    const dealData = getFormData();
+    if (!dealData.opportunityName) {
+        alert('Please fill out at least the Opportunity Name before analyzing.');
+        return;
+    }
+    analyzeBtn.textContent = 'Analyzing...';
+    analyzeBtn.disabled = true;
+    aiResponseContainer.innerHTML = 'Thinking... Please wait.';
+    modal.style.display = 'block';
+    const promptForAI = `You are an elite-level CRO (Chief Revenue Officer) at a top SaaS company, renowned for your sharp, insightful deal coaching. You are reviewing a deal for 'ScreenCloud', a digital signage solution. Your task is to go far beyond a surface-level review. You must synthesize the information provided, connect the dots between different data points, identify subtle risks, and provide a concrete, strategic action plan. Your advice should be the kind that turns a stalled deal into a closed-won opportunity.More actions
 
+Use the MEDDPICC sales qualification framework (Metrics, Economic Buyer, Decision Criteria, Decision Process, Paper Process, Identify Pain, Champion, Competition) as the mental model for your analysis of the data provided below.
+
+Provide your coaching in the following, highly structured format:
+
+**1. The Big Picture (Executive Summary):**
+* Start with a concise, one-sentence summary of the deal's current state and your confidence level.
+* *Example: "This deal has a strong champion and clear pain points, but a poorly defined decision process and lack of economic buyer engagement puts the projected close date at high risk."*
+
+**2. Red Flags & Strategic Gaps:**
+* Go beyond just listing empty fields. For each point, create a synthesis of multiple data points from the submitted information. Explain the **strategic implication** of each red flag. Prioritize this list from most to least critical.
+* *Example Insight: "You've listed 'IT/Cybersecurity' as a stakeholder but haven't specified if our security documentation has been reviewed. Given the 'Projected Close Date' is just 3 weeks away, an unaddressed security review is the single most likely reason this deal will slip."*
+
+**3. Green Flags & Untapped Leverage:**
+* What are the core strengths of this deal that can be amplified? How can we use these strengths to mitigate the risks you identified above?
+* *Example Insight: "The 'Compelling Reason to Act' is a new office opening. You must use this date as a forcing function in every conversation. Frame every request and next step around the shared goal of hitting that deadline."*
+
+**4. Strategic Coaching & Action Plan:**
+* Provide a list of highly specific, productive next steps. For each action, explain the **"Why"** – what risk it mitigates or what critical information it will uncover. These should be strategic moves, not just simple tasks.
+* *Example Action: "Action: Co-author a 'Mutual Close Plan' with your Champion, outlining every step from today until the go-live date. **Why:** This isn't a document for you; it's a tool to test your Champion and expose gaps. It will immediately reveal if they truly know the required procurement (Paper Process) and sign-off (Decision Process) stages."*
+* *Example Action: "Action: Ask your Champion, 'Who besides yourself is most negatively impacted by the business pains you mentioned?' **Why:** This is a tactical question to help you multi-thread to other potential allies. It validates the pain while expanding your influence beyond a single point of contact."*
+
+Here is the deal data to analyze:
+${JSON.stringify(dealData, null, 2)}
+`;
+    try {
+        const response = await fetch('/.netlify/functions/analyze-deal', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                promptForAI: promptForAI
+            })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'The analysis failed.');
+        aiResponseContainer.textContent = result.choices[0].message.content;
+    } catch (error) {
+        console.error('AI Analysis Error:', error);
+        aiResponseContainer.textContent = `An error occurred. Error: ${error.message}`;
+    } finally {
+        analyzeBtn.textContent = 'Let AI Analyze';
+        analyzeBtn.disabled = false;
+    }
+});
     loadSelectedDealBtn.addEventListener('click', async () => {
         const recordId = loadDealSelect.value;
         if (!recordId) return alert('Please select a deal from the list.');

@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const lineCanvas = document.getElementById('line-canvas');
     const addStakeholderBtn = document.getElementById('add-stakeholder-btn');
 
-    // --- STAKEHOLDER MAP STATE & FUNCTIONS (FINAL, CORRECTED VERSION) ---
+    // --- STAKEHOLDER MAP STATE & FUNCTIONS ---
     let stakeholderMapData = { nodes: [], links: [] };
     let isSelectingManager = false;
     let sourceNodeForLink = null;
@@ -95,50 +95,49 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const showRoleDropdown = (nodeId, event) => {
-    event.stopPropagation();
-    // Remove any existing dropdowns first
-    const existingDropdown = document.getElementById('role-dropdown');
-    if (existingDropdown) existingDropdown.remove();
+        event.stopPropagation();
+        deselectAllNodes(true); // Deselect other nodes but keep dropdown from closing
 
-    const roles = ['Champion', 'Economic Buyer', 'Legal', 'IT', 'IS', 'Procurement', 'End User'];
-    const dropdown = document.createElement('div');
-    dropdown.id = 'role-dropdown';
-    dropdown.className = 'role-dropdown';
+        const existingDropdown = document.getElementById('role-dropdown');
+        if (existingDropdown) existingDropdown.remove();
 
-    roles.forEach(role => {
-        const item = document.createElement('div');
-        item.className = 'role-dropdown-item';
-        item.textContent = role;
-        item.onclick = (e) => {
+        const roles = ['Champion', 'Economic Buyer', 'Legal', 'IT', 'IS', 'Procurement', 'End User'];
+        const dropdown = document.createElement('div');
+        dropdown.id = 'role-dropdown';
+        dropdown.className = 'role-dropdown';
+        
+        dropdown.addEventListener('mousedown', e => e.stopPropagation());
+
+        roles.forEach(role => {
+            const item = document.createElement('div');
+            item.className = 'role-dropdown-item';
+            item.textContent = role;
+            item.onclick = (e) => {
+                e.stopPropagation();
+                assignRole(nodeId, role);
+                dropdown.remove();
+            };
+            dropdown.appendChild(item);
+        });
+        
+        const clearItem = document.createElement('div');
+        clearItem.className = 'role-dropdown-item';
+        clearItem.textContent = 'Clear Role';
+        clearItem.style.borderTop = '1px solid var(--border-color)';
+        clearItem.onclick = (e) => {
             e.stopPropagation();
-            assignRole(nodeId, role);
+            assignRole(nodeId, null);
             dropdown.remove();
-        };
-        dropdown.appendChild(item);
-    });
-    
-    const clearItem = document.createElement('div');
-    clearItem.className = 'role-dropdown-item';
-    clearItem.textContent = 'Clear Role';
-    clearItem.style.borderTop = '1px solid var(--border-color)';
-    clearItem.onclick = (e) => {
-        e.stopPropagation();
-        assignRole(nodeId, null);
-        dropdown.remove();
-    }
-    dropdown.appendChild(clearItem);
+        }
+        dropdown.appendChild(clearItem);
 
-    // --- THIS IS THE FIX ---
-    // Instead of adding to the body, add it to the modal content
-    const modalContent = document.getElementById('stakeholder-map-modal-content');
-    modalContent.appendChild(dropdown);
+        const modalContent = document.getElementById('stakeholder-map-modal-content');
+        modalContent.appendChild(dropdown);
 
-    // Position it relative to the modal content, not the whole page
-    const modalRect = modalContent.getBoundingClientRect();
-    dropdown.style.left = `${event.clientX - modalRect.left}px`;
-    dropdown.style.top = `${event.clientY - modalRect.top}px`;
-    // ----------------------
-};
+        const modalRect = modalContent.getBoundingClientRect();
+        dropdown.style.left = `${event.clientX - modalRect.left}px`;
+        dropdown.style.top = `${event.clientY - modalRect.top}px`;
+    };
 
     const deselectAllNodes = (keepDropdown = false) => {
         document.querySelectorAll('.stakeholder-node.selected').forEach(selectedNode => {
@@ -193,11 +192,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         nodeEl.addEventListener('mousedown', (e) => {
-            e.stopPropagation(); // Stop all mousedowns from reaching the canvas
-            
+            e.stopPropagation();
             const actionTarget = e.target.closest('[data-action]');
+            
             if (actionTarget) {
-                // A button was clicked. Handle the action.
                 const action = actionTarget.dataset.action;
                 if (action === 'support') updateSupport(nodeData.id, actionTarget.dataset.value);
                 else if (action === 'influence') updateInfluence(nodeData.id, parseInt(actionTarget.dataset.value, 10));
@@ -205,7 +203,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (action === 'reports-to') initiateReportsTo(nodeData.id);
                 else if (action === 'add-role') showRoleDropdown(nodeData.id, e);
             } else if (isSelectingManager) {
-                // If we are in "reports to" mode, a click on any bubble completes the link
                 if (sourceNodeForLink === nodeData.id) {
                     alert("A stakeholder cannot report to themselves.");
                 } else {
@@ -216,7 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 sourceNodeForLink = null;
                 stakeholderCanvas.style.cursor = 'default';
             } else {
-                // The main bubble was clicked for selection or dragging
                 handleNodeSelection(nodeEl);
                 onDragStart(e);
             }
@@ -272,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const onDrag = (e) => {
         if (!activeNode) return;
-        activeNode.classList.add('dragging'); // Optional: for styling during drag
+        activeNode.classList.add('dragging');
         const canvasRect = stakeholderCanvas.getBoundingClientRect();
         let x = e.clientX - canvasRect.left - offsetX;
         let y = e.clientY - canvasRect.top - offsetY;
@@ -333,41 +329,29 @@ document.addEventListener('DOMContentLoaded', () => {
         titleInput.value = '';
         renderStakeholderMap();
     });
-    
-    // --- CORE FUNCTIONS (Largely Unchanged) ---
-    const updateProgress = () => { /* ... no changes ... */ };
-    const handleBudgetCheckboxChange = () => { /* ... no changes ... */ };
-    const getFormData = () => { /* ... no changes ... */ };
-    const setFormData = (data) => { /* ... no changes ... */ };
 
-    // --- MAIN EVENT LISTENERS (Largely Unchanged) ---
-    form.addEventListener('input', (event) => { /* ... no changes ... */ });
-    addPathStepBtn.addEventListener('click', () => { /* ... no changes ... */ });
-    modalCloseBtn.addEventListener('click', () => modal.style.display = 'none');
-    window.addEventListener('click', (event) => { /* ... no changes ... */ });
-    saveBtn.addEventListener('click', async () => { /* ... no changes ... */ });
-    loadBtn.addEventListener('click', async () => { /* ... no changes ... */ });
-    quickViewBtn.addEventListener('click', () => { /* ... no changes ... */ });
-    quickViewModalCloseBtn.addEventListener('click', () => quickViewModal.style.display = 'none');
-    showGapsBtn.addEventListener('click', () => { /* ... no changes ... */ });
-    analyzeBtn.addEventListener('click', async () => { /* ... no changes ... */ });
-    loadSelectedDealBtn.addEventListener('click', async () => { /* ... no changes ... */ });
-    loadModalCloseBtn.addEventListener('click', () => loadDealModal.style.display = 'none');
-
-    // --- INITIALIZATION ---
-    handleBudgetCheckboxChange();
-    // Copying the full, unchanged functions back in to be safe
-    const originalUpdateProgress = () => {
+    // --- CORE FUNCTIONS ---
+    const updateProgress = () => {
         const visibleFields = allProgressFields.filter(field => field.offsetParent !== null);
         const totalCount = visibleFields.length;
         let completedCount = 0;
         visibleFields.forEach(field => {
-            if (field.type === 'checkbox') { if (field.checked) completedCount++; } 
-            else { if (field.value && field.value.trim() !== '') completedCount++; }
+            if (field.type === 'checkbox') {
+                if (field.checked) {
+                    completedCount++;
+                }
+            } else {
+                if (field.value && field.value.trim() !== '') {
+                    completedCount++;
+                }
+            }
         });
+        
         const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+        
         progressText.textContent = `${percentage}%`;
         progressBarFill.style.width = `${percentage}%`;
+
         if (percentage < 65) {
             progressStatus.textContent = 'Major Risk';
             progressBarFill.style.backgroundColor = 'var(--danger-color)';
@@ -382,13 +366,20 @@ document.addEventListener('DOMContentLoaded', () => {
             progressStatus.style.color = 'var(--success-color)';
         }
     };
-    const originalHandleBudgetCheckboxChange = () => {
-        noBudgetQuestionWrapper.style.display = hasBudgetCheckbox.checked ? 'none' : 'block';
+    
+    const handleBudgetCheckboxChange = () => {
+        if (hasBudgetCheckbox.checked) {
+            noBudgetQuestionWrapper.style.display = 'none';
+        } else {
+            noBudgetQuestionWrapper.style.display = 'block';
+        }
         updateProgress();
     };
-    const originalGetFormData = () => {
+
+    const getFormData = () => {
         const data = {};
         const formData = new FormData(form);
+
         for (let [key, value] of formData.entries()) {
             if (key.endsWith('[]')) {
                 if (!data[key]) data[key] = [];
@@ -397,15 +388,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 data[key] = value;
             }
         }
+        
         document.querySelectorAll('#interactive-checklist input[type="checkbox"]').forEach(cb => {
-            if (cb.offsetParent !== null) data[cb.name] = cb.checked;
+            if (cb.offsetParent !== null) {
+                data[cb.name] = cb.checked;
+            }
         });
+
         data.stakeholderMapData = JSON.stringify(stakeholderMapData);
         return data;
     };
-    const originalSetFormData = (data) => {
+    
+    const setFormData = (data) => {
         form.reset();
         pathToCloseContainer.innerHTML = '';
+
         if (data.stakeholderMapData && data.stakeholderMapData.trim() !== '') {
             try {
                 stakeholderMapData = JSON.parse(data.stakeholderMapData);
@@ -416,15 +413,19 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             stakeholderMapData = { nodes: [], links: [] };
         }
+
         for (const key in data) {
             if (key === 'stakeholderMapData') continue;
+            
             if (key === 'path-to-close[]') {
                 if (data[key] && typeof data[key] === 'string') {
                     data[key].split('\n').forEach(step => {
                         if (step.trim() !== '') {
                             const div = document.createElement('div');
                             div.className = 'path-item';
-                            div.innerHTML = `<input type="text" name="path-to-close[]" value="${step.replace(/"/g, '&quot;')}">`;
+                            // Sanitize value for HTML attribute
+                            const safeStep = step.replace(/"/g, '&quot;');
+                            div.innerHTML = `<input type="text" name="path-to-close[]" value="${safeStep}">`;
                             pathToCloseContainer.appendChild(div);
                         }
                     });
@@ -440,46 +441,76 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+
         if (pathToCloseContainer.children.length === 0) {
-            const div = document.createElement('div');
-            div.className = 'path-item';
-            div.innerHTML = `<input type="text" name="path-to-close[]" placeholder="Enter a step...">`;
-            pathToCloseContainer.appendChild(div);
+             const div = document.createElement('div');
+             div.className = 'path-item';
+             div.innerHTML = `<input type="text" name="path-to-close[]" placeholder="Enter a step...">`;
+             pathToCloseContainer.appendChild(div);
         }
-        originalHandleBudgetCheckboxChange();
-        originalUpdateProgress();
+
+        handleBudgetCheckboxChange();
+        updateProgress();
     };
+
+    // --- EVENT LISTENERS ---
+    form.addEventListener('input', (event) => {
+        if (event.target === hasBudgetCheckbox) {
+            handleBudgetCheckboxChange();
+        } else {
+            updateProgress();
+        }
+    });
+
+    addPathStepBtn.addEventListener('click', () => {
+        const div = document.createElement('div');
+        div.innerHTML = `<input type="text" name="path-to-close[]" placeholder="Enter another step...">`;
+        pathToCloseContainer.appendChild(div);
+        updateProgress();
+    });
+    
+    modalCloseBtn.addEventListener('click', () => modal.style.display = 'none');
     
     window.addEventListener('click', (event) => {
         const modals = document.querySelectorAll('.modal');
         modals.forEach(m => {
-            if (event.target == m) {
+            if (event.target === m) {
                 m.style.display = 'none';
             }
         });
     });
 
-    const originalSaveBtn = async () => {
+    saveBtn.addEventListener('click', async () => {
         const dealData = getFormData();
         const opportunityName = dealData.opportunityName;
+        
         if (!opportunityName) {
             alert('Please enter an Opportunity Name before saving.');
             return;
         }
+        
         if (dealData.arr === '') delete dealData.arr; else dealData.arr = parseInt(dealData.arr, 10);
         if (dealData.screens === '') delete dealData.screens; else dealData.screens = parseInt(dealData.screens, 10);
+        
         if (dealData['path-to-close[]'] && Array.isArray(dealData['path-to-close[]'])) {
-            dealData['path-to-close[]'] = dealData['path-to-close[]'].filter(step => step.trim() !== '').join('\n');
+            dealData['path-to-close[]'] = dealData['path-to-close[]']
+                .filter(step => step.trim() !== '')
+                .join('\n');
         } else {
             dealData['path-to-close[]'] = '';
         }
+        
         saveBtn.textContent = 'Saving...';
         saveBtn.disabled = true;
+
         try {
             const searchUrl = `${AIRTABLE_API_URL}?filterByFormula={opportunityName}="${encodeURIComponent(opportunityName)}"`;
             const searchRes = await fetch(searchUrl, { headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` } });
+            
             if (!searchRes.ok) throw new Error(JSON.stringify(await searchRes.json()));
+            
             const searchData = await searchRes.json();
+            
             const method = (searchData.records && searchData.records.length > 0) ? 'PATCH' : 'POST';
             const recordsPayload = {
                 records: [{
@@ -487,13 +518,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     fields: dealData
                 }]
             };
+
             const response = await fetch(AIRTABLE_API_URL, {
                 method: method,
                 headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify(recordsPayload)
             });
+
             if (!response.ok) throw new Error(JSON.stringify(await response.json()));
             alert(`Deal "${opportunityName}" saved successfully!`);
+
         } catch (error) {
             console.error('Save Error:', error);
             alert(`Failed to save deal. Error: ${error.message}`);
@@ -501,7 +535,179 @@ document.addEventListener('DOMContentLoaded', () => {
             saveBtn.textContent = 'Save Deal';
             saveBtn.disabled = false;
         }
-    };
+    });
 
-    saveBtn.addEventListener('click', originalSaveBtn);
+    loadBtn.addEventListener('click', async () => {
+        loadDealModal.style.display = 'block';
+        loadModalError.textContent = '';
+        loadDealSelect.innerHTML = '<option value="">Loading deals...</option>';
+        loadDealSelect.disabled = true;
+        loadSelectedDealBtn.disabled = true;
+        try {
+            const url = `${AIRTABLE_API_URL}?fields%5B%5D=opportunityName&sort%5B0%5D%5Bfield%5D=opportunityName&sort%5B0%5D%5Bdirection%5D=asc`;
+            const response = await fetch(url, { headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` } });
+            if (!response.ok) throw new Error(JSON.stringify(await response.json()));
+            const data = await response.json();
+            loadDealSelect.innerHTML = '<option value="">-- Please select a deal --</option>';
+            if (data.records && data.records.length > 0) {
+                data.records.forEach(record => {
+                    if (record.fields.opportunityName) {
+                        const option = document.createElement('option');
+                        option.value = record.id;
+                        option.textContent = record.fields.opportunityName;
+                        loadDealSelect.appendChild(option);
+                    }
+                });
+                loadDealSelect.disabled = false;
+                loadSelectedDealBtn.disabled = false;
+            } else {
+                loadDealSelect.innerHTML = '<option value="">-- No deals found --</option>';
+            }
+        } catch (error) {
+            console.error('Error fetching deal list:', error);
+            loadModalError.textContent = `Failed to load deal list. ${error.message}`;
+        }
+    });
+    
+    quickViewBtn.addEventListener('click', () => {
+        quickViewContent.innerHTML = '';
+        const visibleFields = allProgressFields.filter(field => field.offsetParent !== null);
+        const visibleFieldNames = new Set(visibleFields.map(field => field.name));
+        const fieldsets = form.querySelectorAll('fieldset');
+
+        fieldsets.forEach(fieldset => {
+            const legend = fieldset.querySelector('legend');
+            if (!legend) return;
+
+            const fieldsetContainer = document.createElement('div');
+            fieldsetContainer.style.marginBottom = '20px';
+            
+            const legendTitle = document.createElement('h3');
+            legendTitle.textContent = legend.textContent;
+            legendTitle.style.marginBottom = '10px';
+            legendTitle.style.borderBottom = '1px solid var(--border-color)';
+            legendTitle.style.paddingBottom = '5px';
+            fieldsetContainer.appendChild(legendTitle);
+
+            const fieldsInSet = Array.from(fieldset.querySelectorAll('input, textarea'));
+            fieldsInSet.forEach(field => {
+                if (!visibleFieldNames.has(field.name)) return;
+                const labelEl = field.closest('.input-group, .checklist-item')?.querySelector('label');
+                if (!labelEl) return;
+
+                const labelText = labelEl.textContent.trim();
+                let isPopulated = (field.type === 'checkbox') ? field.checked : (field.value && field.value.trim() !== '');
+                
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'quick-view-item';
+                const iconSpan = document.createElement('span');
+                iconSpan.className = 'icon';
+                
+                if (isPopulated) {
+                    iconSpan.innerHTML = '&#10004;';
+                    iconSpan.classList.add('check');
+                } else {
+                    iconSpan.innerHTML = '&#10006;';
+                    iconSpan.classList.add('x');
+                }
+
+                const labelSpan = document.createElement('span');
+                labelSpan.className = 'label-text';
+                labelSpan.textContent = labelText;
+
+                itemDiv.appendChild(iconSpan);
+                itemDiv.appendChild(labelSpan);
+                fieldsetContainer.appendChild(itemDiv);
+            });
+
+            if(fieldsetContainer.querySelector('.quick-view-item')) {
+                quickViewContent.appendChild(fieldsetContainer);
+            }
+        });
+        quickViewModal.style.display = 'block';
+    });
+
+    quickViewModalCloseBtn.addEventListener('click', () => quickViewModal.style.display = 'none');
+
+    showGapsBtn.addEventListener('click', () => {
+        const isActive = showGapsBtn.dataset.active === 'true';
+        const visibleFields = allProgressFields.filter(field => field.offsetParent !== null);
+        if (isActive) {
+            showGapsBtn.textContent = 'Show Gaps';
+            showGapsBtn.dataset.active = 'false';
+            showGapsBtn.style.backgroundColor = 'var(--warning-color)';
+            form.querySelectorAll('.highlight-gap').forEach(el => el.classList.remove('highlight-gap'));
+        } else {
+            showGapsBtn.textContent = 'Hide Gaps';
+            showGapsBtn.dataset.active = 'true';
+            showGapsBtn.style.backgroundColor = '#2D3748';
+            visibleFields.forEach(field => {
+                let isGap = (field.type === 'checkbox') ? !field.checked : (!field.value || field.value.trim() === '');
+                if (isGap) {
+                    let elementToHighlight = field;
+                    if (field.type === 'checkbox') {
+                        const parentItem = field.closest('.checklist-item');
+                        if (parentItem) elementToHighlight = parentItem;
+                    }
+                    elementToHighlight.classList.add('highlight-gap');
+                }
+            });
+        }
+    });
+    
+    analyzeBtn.addEventListener('click', async () => {
+        const dealData = getFormData();
+        if (!dealData.opportunityName) {
+            alert('Please fill out at least the Opportunity Name before analyzing.');
+            return;
+        }
+        analyzeBtn.textContent = 'Analyzing...';
+        analyzeBtn.disabled = true;
+        aiResponseContainer.innerHTML = 'Thinking... Please wait.';
+        modal.style.display = 'block';
+        const promptForAI = `...`; // Prompt removed for brevity
+        try {
+            const response = await fetch('/.netlify/functions/analyze-deal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ promptForAI: promptForAI })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'The analysis failed.');
+            aiResponseContainer.textContent = result.choices[0].message.content;
+        } catch (error) {
+            console.error('AI Analysis Error:', error);
+            aiResponseContainer.textContent = `An error occurred. Error: ${error.message}`;
+        } finally {
+            analyzeBtn.textContent = 'Let AI Analyze';
+            analyzeBtn.disabled = false;
+        }
+    });
+
+    loadSelectedDealBtn.addEventListener('click', async () => {
+        const recordId = loadDealSelect.value;
+        if (!recordId) return alert('Please select a deal from the list.');
+        loadSelectedDealBtn.textContent = 'Loading...';
+        loadSelectedDealBtn.disabled = true;
+        try {
+            const url = `${AIRTABLE_API_URL}/${recordId}`;
+            const response = await fetch(url, { headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` } });
+            if (!response.ok) throw new Error(JSON.stringify(await response.json()));
+            const data = await response.json();
+            setFormData(data.fields);
+            alert(`Deal "${data.fields.opportunityName}" loaded successfully!`);
+            loadDealModal.style.display = 'none';
+        } catch (error) {
+            console.error('Load Error:', error);
+            loadModalError.textContent = `Failed to load deal. ${error.message}`;
+        } finally {
+            loadSelectedDealBtn.textContent = 'Load Selected Deal';
+            loadSelectedDealBtn.disabled = false;
+        }
+    });
+    
+    loadModalCloseBtn.addEventListener('click', () => loadDealModal.style.display = 'none');
+
+    // --- INITIALIZATION ---
+    handleBudgetCheckboxChange();
 });

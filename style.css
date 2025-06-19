@@ -488,7 +488,8 @@ td input[type="text"] {
     height: 85vh;
     display: flex;
     flex-direction: column;
-    margin: 4% auto; 
+    /* FIX: Reduced top margin to move the modal higher */
+    margin: 2% auto; 
 }
 
 .map-controls {

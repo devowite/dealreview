@@ -13,8 +13,9 @@
     <div class="container">
         <header>
             <div class="header-content">
-                <h1>Deal Checklist</h1>
-                <button type="button" id="stakeholder-map-btn" class="add-button" style="margin-left: 0; margin-top: 10px;">Stakeholder Map</button>
+                <div>
+                    <h1>Deal Checklist</h1>
+                    <button type="button" id="stakeholder-map-btn" class="add-button" style="margin-left: 0; margin-top: 10px;">Stakeholder Map</button>
                 </div>
                 <div class="top-action-buttons">
                     <button type="button" id="show-gaps-btn">Show Gaps</button>
@@ -251,9 +252,7 @@
                 <div id="ai-response"></div>
             </div>
         </div>
-    </div>
-    
-<div id="load-deal-modal" class="modal">
+    </div> <div id="load-deal-modal" class="modal">
         <div class="modal-content">
             <span id="load-modal-close-btn" class="close-button">&times;</span>
             <h2>Select a Deal to Load</h2>
@@ -268,31 +267,31 @@
     </div>
 
     <div id="quick-view-modal" class="modal">
-    <div class="modal-content">
-        <span id="quick-view-modal-close-btn" class="close-button">&times;</span>
-        <h2>Deal Fields Status</h2>
-        <div id="quick-view-content"></div>
+        <div class="modal-content">
+            <span id="quick-view-modal-close-btn" class="close-button">&times;</span>
+            <h2>Deal Fields Status</h2>
+            <div id="quick-view-content"></div>
+        </div>
     </div>
-</div>
 
     <div id="stakeholder-map-modal" class="modal">
-    <div class="modal-content" id="stakeholder-map-modal-content">
-        <span id="stakeholder-map-close-btn" class="close-button">&times;</span>
-        <h2>Stakeholder Influence Map</h2>
-        
-        <div class="map-controls">
-            <input type="text" id="new-stakeholder-name" placeholder="Stakeholder Name">
-            <input type="text" id="new-stakeholder-title" placeholder="Title/Role">
-            <button type="button" id="add-stakeholder-btn">Add Stakeholder</button>
-        </div>
+        <div class="modal-content" id="stakeholder-map-modal-content">
+            <span id="stakeholder-map-close-btn" class="close-button">&times;</span>
+            <h2>Stakeholder Influence Map</h2>
+            
+            <div class="map-controls">
+                <input type="text" id="new-stakeholder-name" placeholder="Stakeholder Name">
+                <input type="text" id="new-stakeholder-title" placeholder="Title/Role">
+                <button type="button" id="add-stakeholder-btn">Add Stakeholder</button>
+            </div>
 
-        <div id="stakeholder-canvas-wrapper">
-            <div id="stakeholder-canvas">
+            <div id="stakeholder-canvas-wrapper">
+                <div id="stakeholder-canvas">
                 </div>
-             <svg id="line-canvas"></svg>
+                 <svg id="line-canvas"></svg>
+            </div>
         </div>
     </div>
-</div>
     
     <div id="floating-progress-bar" class="progress-container">
         <div class="progress-bar-label">

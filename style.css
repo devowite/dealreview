@@ -630,3 +630,52 @@ td input[type="text"] {
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
+
+/* ADD THESE NEW STYLES */
+
+.add-role-btn {
+    font-size: 0.65em;
+    font-weight: 600;
+    cursor: pointer;
+    border-left: 1px solid var(--border-color);
+    padding: 2px 0 2px 8px;
+    margin-left: 3px;
+    user-select: none; /* Prevents text selection on click */
+}
+
+.role-dropdown {
+    position: absolute;
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 100;
+    padding: 5px 0;
+}
+
+.role-dropdown-item {
+    padding: 8px 15px;
+    font-size: 0.9em;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.role-dropdown-item:hover {
+    background-color: #f0f4f8;
+}
+
+.role-badge {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 100%;
+    margin-left: 8px;
+    background-color: #FFD700; /* Gold color */
+    color: #4A3A00;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.7em;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}

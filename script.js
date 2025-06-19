@@ -37,6 +37,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadSelectedDealBtn = document.getElementById('load-selected-deal-btn');
     const loadModalError = document.getElementById('load-modal-error');
 
+    const quickViewBtn = document.getElementById('quick-view-btn');
+    const quickViewModal = document.getElementById('quick-view-modal');
+    const quickViewModalCloseBtn = document.getElementById('quick-view-modal-close-btn');
+    const quickViewContent = document.getElementById('quick-view-content');
+
     // --- CORE FUNCTIONS ---
     const updateProgress = () => {
         const visibleFields = allProgressFields.filter(field => field.offsetParent !== null);
@@ -317,6 +322,86 @@ document.addEventListener('DOMContentLoaded', () => {
             loadModalError.textContent = `Failed to load deal list. ${error.message}`;
         }
     });
+
+    quickViewBtn.addEventListener('click', () => {
+    quickViewContent.innerHTML = ''; // Clear previous content
+
+    // Filter for visible fields and create a Set of their names for easy lookup
+    const visibleFields = allProgressFields.filter(field => field.offsetParent !== null);
+    const visibleFieldNames = new Set(visibleFields.map(field => field.name));
+
+    // We'll process fieldsets to keep the order and grouping logical
+    const fieldsets = form.querySelectorAll('fieldset');
+
+    fieldsets.forEach(fieldset => {
+        const legend = fieldset.querySelector('legend');
+        if (!legend) return;
+
+        // Create a container for the fieldset
+        const fieldsetContainer = document.createElement('div');
+        fieldsetContainer.style.marginBottom = '20px'; // Add space between groups
+        
+        const legendTitle = document.createElement('h3');
+        legendTitle.textContent = legend.textContent;
+        legendTitle.style.marginBottom = '10px';
+        legendTitle.style.borderBottom = '1px solid var(--border-color)';
+        legendTitle.style.paddingBottom = '5px';
+        fieldsetContainer.appendChild(legendTitle);
+
+        const fieldsInSet = Array.from(fieldset.querySelectorAll('input, textarea'));
+
+        fieldsInSet.forEach(field => {
+            // Only include fields that are currently visible
+            if (!visibleFieldNames.has(field.name)) return;
+
+            // Find the label associated with the input
+            const labelEl = field.closest('.input-group, .checklist-item')?.querySelector('label');
+            if (!labelEl) return; // Skip if no label is found
+
+            const labelText = labelEl.textContent.trim();
+            let isPopulated = false;
+
+            if (field.type === 'checkbox') {
+                isPopulated = field.checked;
+            } else if (field.value && field.value.trim() !== '') {
+                isPopulated = true;
+            }
+            
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'quick-view-item';
+
+            const iconSpan = document.createElement('span');
+            iconSpan.className = 'icon';
+            
+            if (isPopulated) {
+                iconSpan.innerHTML = '&#10004;'; // Checkmark
+                iconSpan.classList.add('check');
+            } else {
+                iconSpan.innerHTML = '&#10006;'; // X mark
+                iconSpan.classList.add('x');
+            }
+
+            const labelSpan = document.createElement('span');
+            labelSpan.className = 'label-text';
+            labelSpan.textContent = labelText;
+
+            itemDiv.appendChild(iconSpan);
+            itemDiv.appendChild(labelSpan);
+            fieldsetContainer.appendChild(itemDiv);
+        });
+
+        // Only append the container if it has fields in it
+        if(fieldsetContainer.querySelector('.quick-view-item')) {
+            quickViewContent.appendChild(fieldsetContainer);
+        }
+    });
+
+    quickViewModal.style.display = 'block';
+});
+
+    quickViewModalCloseBtn.addEventListener('click', () => {
+    quickViewModal.style.display = 'none';
+});
     
     analyzeBtn.addEventListener('click', async () => {
         const dealData = getFormData();

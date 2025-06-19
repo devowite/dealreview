@@ -488,7 +488,6 @@ td input[type="text"] {
     height: 85vh;
     display: flex;
     flex-direction: column;
-    /* FIX: This helps center the modal vertically in the viewport */
     margin: 4% auto; 
 }
 
@@ -520,12 +519,6 @@ td input[type="text"] {
     height: 2000px;
 }
 
-/* NEW: Rule to hide controls when this class is active */
-#stakeholder-canvas.controls-hidden .node-menu,
-#stakeholder-canvas.controls-hidden .node-controls {
-    display: none;
-}
-
 #line-canvas {
     position: absolute;
     top: 0;
@@ -549,13 +542,34 @@ td input[type="text"] {
     text-align: center;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     z-index: 10;
-    transition: width 0.2s ease, height 0.2s ease;
+    transition: width 0.2s ease, height 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Add a highlight effect for the selected node */
+.stakeholder-node.selected {
+    box-shadow: 0 0 0 4px var(--primary-color);
+    z-index: 11;
 }
 
 .stakeholder-node:active {
     cursor: grabbing;
-    z-index: 11;
+    z-index: 12;
 }
+
+/* Hide controls by default */
+.node-menu, .node-controls {
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.2s linear;
+}
+
+/* Show controls only on the selected node */
+.stakeholder-node.selected .node-menu,
+.stakeholder-node.selected .node-controls {
+    visibility: visible;
+    opacity: 1;
+}
+
 
 /* Support Level Colors */
 .stakeholder-node.supporter { border-color: var(--success-color); background-color: #f0fff4; }
@@ -591,12 +605,11 @@ td input[type="text"] {
 }
 
 .add-manager-btn {
-    /* FIX: Reduced font-size and adjusted padding */
     font-size: 0.65em; 
     font-weight: 600;
     cursor: pointer;
     border-left: 1px solid var(--border-color);
-    padding: 2px 0 2px 8px; /* Adjusted padding */
+    padding: 2px 0 2px 8px;
     margin-left: 3px;
 }
 

@@ -48,151 +48,204 @@ document.addEventListener('DOMContentLoaded', () => {
     const lineCanvas = document.getElementById('line-canvas');
     const addStakeholderBtn = document.getElementById('add-stakeholder-btn');
 
-    // --- STAKEHOLDER MAP STATE & FUNCTIONS (RE-ARCHITECTED) ---
-    let stakeholderMapData = { nodes: [], links: [] };
-    let isSelectingManager = false;
-    let sourceNodeForLink = null;
-    let activeNode = null;
-    let offsetX, offsetY;
+    // --- STAKEHOLDER MAP STATE & FUNCTIONS (FINAL VERSION) ---
+let stakeholderMapData = { nodes: [], links: [] };
+let isSelectingManager = false;
+let sourceNodeForLink = null;
+let activeNode = null;
+let offsetX, offsetY;
 
-    const updateInfluence = (nodeId, change) => {
-        const node = stakeholderMapData.nodes.find(n => n.id === nodeId);
-        if (node) {
-            node.influence = Math.max(0, node.influence + change);
-            renderStakeholderMap();
-        }
-    };
+const updateInfluence = (nodeId, change) => {
+    const node = stakeholderMapData.nodes.find(n => n.id === nodeId);
+    if (node) {
+        node.influence = Math.max(0, node.influence + change);
+        renderStakeholderMap();
+    }
+};
 
-    const updateSupport = (nodeId, newSupport) => {
-        const node = stakeholderMapData.nodes.find(n => n.id === nodeId);
-        if (node) {
-            node.support = newSupport;
-            renderStakeholderMap();
-        }
-    };
+const updateSupport = (nodeId, newSupport) => {
+    const node = stakeholderMapData.nodes.find(n => n.id === nodeId);
+    if (node) {
+        node.support = newSupport;
+        renderStakeholderMap();
+    }
+};
 
-    const initiateReportsTo = (nodeId) => {
-        isSelectingManager = true;
-        sourceNodeForLink = nodeId;
-        stakeholderCanvas.style.cursor = 'crosshair';
-        alert(`Select the manager that this person reports to.`);
-    };
+const initiateReportsTo = (nodeId) => {
+    isSelectingManager = true;
+    sourceNodeForLink = nodeId;
+    stakeholderCanvas.style.cursor = 'crosshair';
+    alert(`Select the manager that this person reports to.`);
+};
 
-    const removeNode = (nodeId) => {
-        if (confirm('Are you sure you want to remove this stakeholder?')) {
-            stakeholderMapData.nodes = stakeholderMapData.nodes.filter(n => n.id !== nodeId);
-            stakeholderMapData.links = stakeholderMapData.links.filter(l => l.source !== nodeId && l.target !== nodeId);
-            renderStakeholderMap();
-        }
-    };
+const removeNode = (nodeId) => {
+    if (confirm('Are you sure you want to remove this stakeholder?')) {
+        stakeholderMapData.nodes = stakeholderMapData.nodes.filter(n => n.id !== nodeId);
+        stakeholderMapData.links = stakeholderMapData.links.filter(l => l.source !== nodeId && l.target !== nodeId);
+        renderStakeholderMap();
+    }
+};
 
-    const deselectAllNodes = () => {
-        document.querySelectorAll('.stakeholder-node.selected').forEach(selectedNode => {
-            selectedNode.classList.remove('selected');
-        });
-    };
+const assignRole = (nodeId, role) => {
+    const node = stakeholderMapData.nodes.find(n => n.id === nodeId);
+    if (node) {
+        // If the same role is clicked again, remove it. Otherwise, assign it.
+        node.role = node.role === role ? null : role;
+    }
+    renderStakeholderMap();
+};
 
-    const handleNodeClick = (nodeEl, nodeId) => {
-        if (isSelectingManager) {
-            if (sourceNodeForLink === nodeId) {
-                alert("A stakeholder cannot report to themselves.");
-                isSelectingManager = false; // Cancel the action
-                stakeholderCanvas.style.cursor = 'default';
-                return;
-            }
-            stakeholderMapData.links.push({ source: sourceNodeForLink, target: nodeId });
+const showRoleDropdown = (nodeId, event) => {
+    event.stopPropagation();
+    // Remove any existing dropdowns first
+    const existingDropdown = document.getElementById('role-dropdown');
+    if (existingDropdown) existingDropdown.remove();
+
+    const roles = ['Champion', 'Economic Buyer', 'Legal', 'IT', 'IS', 'Procurement', 'End User'];
+    const dropdown = document.createElement('div');
+    dropdown.id = 'role-dropdown';
+    dropdown.className = 'role-dropdown';
+
+    roles.forEach(role => {
+        const item = document.createElement('div');
+        item.className = 'role-dropdown-item';
+        item.textContent = role;
+        item.onclick = (e) => {
+            e.stopPropagation();
+            assignRole(nodeId, role);
+            dropdown.remove();
+        };
+        dropdown.appendChild(item);
+    });
+    
+    // Add an option to clear the role
+    const clearItem = document.createElement('div');
+    clearItem.className = 'role-dropdown-item';
+    clearItem.textContent = 'Clear Role';
+    clearItem.style.borderTop = '1px solid var(--border-color)';
+    clearItem.onclick = (e) => {
+        e.stopPropagation();
+        assignRole(nodeId, null); // Pass null to clear the role
+        dropdown.remove();
+    }
+    dropdown.appendChild(clearItem);
+
+    document.body.appendChild(dropdown);
+    dropdown.style.left = `${event.pageX}px`;
+    dropdown.style.top = `${event.pageY}px`;
+};
+
+const deselectAllNodes = () => {
+    document.querySelectorAll('.stakeholder-node.selected').forEach(selectedNode => {
+        selectedNode.classList.remove('selected');
+    });
+    const existingDropdown = document.getElementById('role-dropdown');
+    if (existingDropdown) existingDropdown.remove();
+};
+
+const handleNodeClick = (nodeEl, nodeId) => {
+    if (isSelectingManager) {
+        if (sourceNodeForLink === nodeId) {
+            alert("A stakeholder cannot report to themselves.");
             isSelectingManager = false;
-            sourceNodeForLink = null;
             stakeholderCanvas.style.cursor = 'default';
-            renderStakeholderMap();
+            return;
+        }
+        stakeholderMapData.links.push({ source: sourceNodeForLink, target: nodeId });
+        isSelectingManager = false;
+        sourceNodeForLink = null;
+        stakeholderCanvas.style.cursor = 'default';
+        renderStakeholderMap();
+    } else {
+        const isAlreadySelected = nodeEl.classList.contains('selected');
+        deselectAllNodes();
+        if (!isAlreadySelected) {
+            nodeEl.classList.add('selected');
+        }
+    }
+};
+
+const createNodeElement = (nodeData) => {
+    const nodeEl = document.createElement('div');
+    nodeEl.className = `stakeholder-node ${nodeData.support}`;
+    nodeEl.id = `node-${nodeData.id}`;
+    nodeEl.style.left = `${nodeData.x}px`;
+    nodeEl.style.top = `${nodeData.y}px`;
+    const size = 60 + (nodeData.influence * 15);
+    nodeEl.style.width = `${size}px`;
+    nodeEl.style.height = `${size}px`;
+
+    nodeEl.innerHTML = `
+        <div class="node-menu">
+            <span data-action="support" data-value="supporter">S</span>
+            <span data-action="support" data-value="neutral">N</span>
+            <span data-action="support" data-value="detractor">D</span>
+            <span data-action="remove">&#10006;</span>
+        </div>
+        <div class="node-name">${nodeData.name}</div>
+        <div class="node-title">${nodeData.title}</div>
+        <div class="node-controls">
+            <span class="influence-control" data-action="influence" data-value="-1">&#9660;</span>
+            <span class="influence-control" data-action="influence" data-value="1">&#9650;</span>
+            <span class="add-manager-btn" data-action="reports-to">Reports To</span>
+            <span class="add-role-btn" data-action="add-role">&#9733; Role</span>
+        </div>
+    `;
+    
+    // Add the role badge if it exists
+    if (nodeData.role) {
+        const badge = document.createElement('div');
+        badge.className = 'role-badge';
+        badge.textContent = nodeData.role;
+        nodeEl.appendChild(badge);
+    }
+
+    nodeEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        handleNodeClick(nodeEl, nodeData.id);
+    });
+
+    nodeEl.addEventListener('mousedown', (e) => {
+        const action = e.target.dataset.action;
+        if (action) {
+            e.stopPropagation();
+            if (action === 'support') updateSupport(nodeData.id, e.target.dataset.value);
+            else if (action === 'influence') updateInfluence(nodeData.id, parseInt(e.target.dataset.value, 10));
+            else if (action === 'remove') removeNode(nodeData.id);
+            else if (action === 'reports-to') initiateReportsTo(nodeData.id);
+            else if (action === 'add-role') showRoleDropdown(nodeData.id, e);
         } else {
-            const isAlreadySelected = nodeEl.classList.contains('selected');
-            deselectAllNodes();
-            if (!isAlreadySelected) {
-                nodeEl.classList.add('selected');
-            }
+            onDragStart(e);
         }
-    };
+    });
 
-    const createNodeElement = (nodeData) => {
-        const nodeEl = document.createElement('div');
-        nodeEl.className = `stakeholder-node ${nodeData.support}`;
-        nodeEl.id = `node-${nodeData.id}`;
-        nodeEl.style.left = `${nodeData.x}px`;
-        nodeEl.style.top = `${nodeData.y}px`;
-        const size = 60 + (nodeData.influence * 15);
-        nodeEl.style.width = `${size}px`;
-        nodeEl.style.height = `${size}px`;
+    stakeholderCanvas.appendChild(nodeEl);
+};
 
-        nodeEl.innerHTML = `
-            <div class="node-menu">
-                <span data-action="support" data-value="supporter">S</span>
-                <span data-action="support" data-value="neutral">N</span>
-                <span data-action="support" data-value="detractor">D</span>
-                <span data-action="remove">&#10006;</span>
-            </div>
-            <div class="node-name">${nodeData.name}</div>
-            <div class="node-title">${nodeData.title}</div>
-            <div class="node-controls">
-                <span class="influence-control" data-action="influence" data-value="-1">&#9660;</span>
-                <span class="influence-control" data-action="influence" data-value="1">&#9650;</span>
-                <span class="add-manager-btn" data-action="reports-to">Connect</span>
-            </div>
-        `;
+const renderStakeholderMap = () => {
+    const selectedId = document.querySelector('.stakeholder-node.selected')?.id.replace('node-','');
+    stakeholderCanvas.innerHTML = '';
+    stakeholderMapData.nodes.forEach(nodeData => createNodeElement(nodeData));
+    if(selectedId) {
+        document.getElementById(`node-${selectedId}`)?.classList.add('selected');
+    }
+    drawLines();
+};
 
-        // Main click listener for selection
-        nodeEl.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevents the canvas click from firing immediately
-            handleNodeClick(nodeEl, nodeData.id);
-        });
-        
-        // Mousedown listener to handle both dragging and button clicks
-        nodeEl.addEventListener('mousedown', (e) => {
-            const action = e.target.dataset.action;
-            if (action) {
-                e.stopPropagation(); // Prevent drag from starting if a button is clicked
-                if (action === 'support') updateSupport(nodeData.id, e.target.dataset.value);
-                else if (action === 'influence') updateInfluence(nodeData.id, parseInt(e.target.dataset.value, 10));
-                else if (action === 'remove') removeNode(nodeData.id);
-                else if (action === 'reports-to') initiateReportsTo(nodeData.id);
-            } else {
-                onDragStart(e); // Only start dragging if not clicking a button
-            }
-        });
-
-        stakeholderCanvas.appendChild(nodeEl);
-    };
-
-    const renderStakeholderMap = () => {
-        const selectedId = document.querySelector('.stakeholder-node.selected')?.id.replace('node-','');
-        stakeholderCanvas.innerHTML = '';
-        stakeholderMapData.nodes.forEach(nodeData => createNodeElement(nodeData));
-        if(selectedId) {
-            document.getElementById(`node-${selectedId}`)?.classList.add('selected');
-        }
-        drawLines();
-    };
-
-   const drawLines = () => {
-    // FIX: This now intelligently clears only the lines, preserving the <defs>
+const drawLines = () => {
     const defs = lineCanvas.querySelector('defs')?.outerHTML;
-    lineCanvas.innerHTML = defs || ''; // Keep existing defs, or clear if none
-
+    lineCanvas.innerHTML = defs || '';
     stakeholderMapData.links.forEach(link => {
         const sourceNodeEl = document.getElementById(`node-${link.source}`);
         const targetNodeEl = document.getElementById(`node-${link.target}`);
-
         if (!sourceNodeEl || !targetNodeEl) return;
-
         const sourceRect = sourceNodeEl.getBoundingClientRect();
         const targetRect = targetNodeEl.getBoundingClientRect();
         const canvasRect = stakeholderCanvas.getBoundingClientRect();
-
         const x1 = (sourceRect.left - canvasRect.left) + (sourceRect.width / 2);
         const y1 = (sourceRect.top - canvasRect.top) + (sourceRect.height / 2);
         const x2 = (targetRect.left - canvasRect.left) + (targetRect.width / 2);
         const y2 = (targetRect.top - canvasRect.top) + (targetRect.height / 2);
-
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('x1', x1);
         line.setAttribute('y1', y1);
@@ -205,39 +258,77 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 };
 
-    const onDragStart = (e) => {
-        e.preventDefault();
-        activeNode = e.currentTarget;
-        offsetX = e.clientX - activeNode.getBoundingClientRect().left;
-        offsetY = e.clientY - activeNode.getBoundingClientRect().top;
-        document.addEventListener('mousemove', onDrag);
-        document.addEventListener('mouseup', onDragEnd);
-    };
+const onDragStart = (e) => {
+    e.preventDefault();
+    deselectAllNodes(); // Deselect nodes when starting a drag
+    activeNode = e.currentTarget;
+    offsetX = e.clientX - activeNode.getBoundingClientRect().left;
+    offsetY = e.clientY - activeNode.getBoundingClientRect().top;
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', onDragEnd);
+};
 
-    const onDrag = (e) => {
-        if (!activeNode) return;
-        const canvasRect = stakeholderCanvas.getBoundingClientRect();
-        let x = e.clientX - canvasRect.left - offsetX;
-        let y = e.clientY - canvasRect.top - offsetY;
-        x = Math.max(0, Math.min(x, stakeholderCanvas.clientWidth - activeNode.clientWidth));
-        y = Math.max(0, Math.min(y, stakeholderCanvas.clientHeight - activeNode.clientHeight));
-        activeNode.style.left = `${x}px`;
-        activeNode.style.top = `${y}px`;
-        drawLines();
-    };
+const onDrag = (e) => {
+    if (!activeNode) return;
+    const canvasRect = stakeholderCanvas.getBoundingClientRect();
+    let x = e.clientX - canvasRect.left - offsetX;
+    let y = e.clientY - canvasRect.top - offsetY;
+    x = Math.max(0, Math.min(x, stakeholderCanvas.clientWidth - activeNode.clientWidth));
+    y = Math.max(0, Math.min(y, stakeholderCanvas.clientHeight - activeNode.clientHeight));
+    activeNode.style.left = `${x}px`;
+    activeNode.style.top = `${y}px`;
+    drawLines();
+};
 
-    const onDragEnd = () => {
-        if (!activeNode) return;
-        const nodeId = activeNode.id.replace('node-', '');
-        const nodeData = stakeholderMapData.nodes.find(n => n.id === nodeId);
-        if (nodeData) {
-            nodeData.x = parseInt(activeNode.style.left, 10);
-            nodeData.y = parseInt(activeNode.style.top, 10);
-        }
-        activeNode = null;
-        document.removeEventListener('mousemove', onDrag);
-        document.removeEventListener('mouseup', onDragEnd);
+const onDragEnd = () => {
+    if (!activeNode) return;
+    const nodeId = activeNode.id.replace('node-', '');
+    const nodeData = stakeholderMapData.nodes.find(n => n.id === nodeId);
+    if (nodeData) {
+        nodeData.x = parseInt(activeNode.style.left, 10);
+        nodeData.y = parseInt(activeNode.style.top, 10);
+    }
+    activeNode = null;
+    document.removeEventListener('mousemove', onDrag);
+    document.removeEventListener('mouseup', onDragEnd);
+};
+
+// --- Stakeholder Map Event Listeners ---
+stakeholderMapBtn.addEventListener('click', () => {
+    stakeholderMapModal.style.display = 'block';
+    renderStakeholderMap();
+});
+
+stakeholderMapCloseBtn.addEventListener('click', () => {
+    stakeholderMapModal.style.display = 'none';
+});
+
+stakeholderCanvas.addEventListener('click', () => {
+    deselectAllNodes();
+});
+
+addStakeholderBtn.addEventListener('click', () => {
+    const nameInput = document.getElementById('new-stakeholder-name');
+    const titleInput = document.getElementById('new-stakeholder-title');
+    if (nameInput.value.trim() === '') {
+        alert('Please enter a name.');
+        return;
+    }
+    const newNode = {
+        id: Date.now().toString(),
+        name: nameInput.value.trim(),
+        title: titleInput.value.trim(),
+        support: 'neutral',
+        influence: 1,
+        x: 50,
+        y: 50,
+        role: null // Initialize role as null
     };
+    stakeholderMapData.nodes.push(newNode);
+    nameInput.value = '';
+    titleInput.value = '';
+    renderStakeholderMap();
+});
     
     // --- CORE FUNCTIONS (Unchanged from here) ---
     const updateProgress = () => {

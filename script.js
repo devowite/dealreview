@@ -72,11 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const initiateReportsTo = (nodeId) => {
-        isSelectingManager = true;
-        sourceNodeForLink = nodeId;
-        stakeholderCanvas.style.cursor = 'crosshair';
-        alert(`Select the manager that this person reports to.`);
-    };
+    isSelectingManager = true;
+    sourceNodeForLink = nodeId;
+    stakeholderCanvas.style.cursor = 'crosshair';
+};
 
     const removeNode = (nodeId) => {
         if (confirm('Are you sure you want to remove this stakeholder?')) {
@@ -179,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="node-controls">
                 <span class="influence-control" data-action="influence" data-value="-1">&#9660;</span>
                 <span class="influence-control" data-action="influence" data-value="1">&#9650;</span>
-                <span class="add-manager-btn" data-action="reports-to">Reports To</span>
+                <span class="add-manager-btn" data-action="reports-to">Connect</span>
                 <span class="add-role-btn" data-action="add-role">&#9733; Role</span>
             </div>
         `;

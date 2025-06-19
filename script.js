@@ -95,46 +95,50 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const showRoleDropdown = (nodeId, event) => {
-        event.stopPropagation();
-        deselectAllNodes(true); // Deselect other nodes but keep dropdowns
+    event.stopPropagation();
+    // Remove any existing dropdowns first
+    const existingDropdown = document.getElementById('role-dropdown');
+    if (existingDropdown) existingDropdown.remove();
 
-        const existingDropdown = document.getElementById('role-dropdown');
-        if (existingDropdown) existingDropdown.remove();
+    const roles = ['Champion', 'Economic Buyer', 'Legal', 'IT', 'IS', 'Procurement', 'End User'];
+    const dropdown = document.createElement('div');
+    dropdown.id = 'role-dropdown';
+    dropdown.className = 'role-dropdown';
 
-        const roles = ['Champion', 'Economic Buyer', 'Legal', 'IT', 'IS', 'Procurement', 'End User'];
-        const dropdown = document.createElement('div');
-        dropdown.id = 'role-dropdown';
-        dropdown.className = 'role-dropdown';
-        
-        dropdown.addEventListener('mousedown', e => e.stopPropagation()); // Prevent dropdown from closing itself
-
-        roles.forEach(role => {
-            const item = document.createElement('div');
-            item.className = 'role-dropdown-item';
-            item.textContent = role;
-            item.onclick = (e) => {
-                e.stopPropagation();
-                assignRole(nodeId, role);
-                dropdown.remove();
-            };
-            dropdown.appendChild(item);
-        });
-        
-        const clearItem = document.createElement('div');
-        clearItem.className = 'role-dropdown-item';
-        clearItem.textContent = 'Clear Role';
-        clearItem.style.borderTop = '1px solid var(--border-color)';
-        clearItem.onclick = (e) => {
+    roles.forEach(role => {
+        const item = document.createElement('div');
+        item.className = 'role-dropdown-item';
+        item.textContent = role;
+        item.onclick = (e) => {
             e.stopPropagation();
-            assignRole(nodeId, null);
+            assignRole(nodeId, role);
             dropdown.remove();
-        }
-        dropdown.appendChild(clearItem);
+        };
+        dropdown.appendChild(item);
+    });
+    
+    const clearItem = document.createElement('div');
+    clearItem.className = 'role-dropdown-item';
+    clearItem.textContent = 'Clear Role';
+    clearItem.style.borderTop = '1px solid var(--border-color)';
+    clearItem.onclick = (e) => {
+        e.stopPropagation();
+        assignRole(nodeId, null);
+        dropdown.remove();
+    }
+    dropdown.appendChild(clearItem);
 
-        document.body.appendChild(dropdown);
-        dropdown.style.left = `${event.pageX}px`;
-        dropdown.style.top = `${event.pageY}px`;
-    };
+    // --- THIS IS THE FIX ---
+    // Instead of adding to the body, add it to the modal content
+    const modalContent = document.getElementById('stakeholder-map-modal-content');
+    modalContent.appendChild(dropdown);
+
+    // Position it relative to the modal content, not the whole page
+    const modalRect = modalContent.getBoundingClientRect();
+    dropdown.style.left = `${event.clientX - modalRect.left}px`;
+    dropdown.style.top = `${event.clientY - modalRect.top}px`;
+    // ----------------------
+};
 
     const deselectAllNodes = (keepDropdown = false) => {
         document.querySelectorAll('.stakeholder-node.selected').forEach(selectedNode => {

@@ -417,3 +417,48 @@ td input[type="text"] {
     margin-top: 15px;
     font-weight: 500;
 }
+
+#quick-view-btn {
+    background-color: #718096; /* A neutral gray */
+    color: white;
+    border-color: #718096;
+}
+#quick-view-btn:hover { background-color: #4A5568; }
+
+/* Styles for the Quick View Modal Content */
+#quick-view-content {
+    margin-top: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 15px; /* Add some padding for the scrollbar */
+}
+
+.quick-view-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.quick-view-item:last-child {
+    border-bottom: none;
+}
+
+.quick-view-item .icon {
+    margin-right: 15px;
+    font-size: 1.4em;
+    font-weight: bold;
+}
+
+.quick-view-item .icon.check {
+    color: var(--success-color);
+}
+
+.quick-view-item .icon.x {
+    color: var(--danger-color);
+}
+
+.quick-view-item .label-text {
+    font-weight: 500;
+    color: var(--text-color);
+}

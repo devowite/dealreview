@@ -462,3 +462,22 @@ td input[type="text"] {
     font-weight: 500;
     color: var(--text-color);
 }
+
+#show-gaps-btn {
+    background-color: var(--warning-color);
+    color: white;
+    border-color: var(--warning-color);
+}
+#show-gaps-btn:hover { background-color: #dd9b4d; }
+
+/* Style for highlighting empty/unchecked fields */
+.highlight-gap {
+    border: 2px solid var(--danger-color) !important;
+    box-shadow: 0 0 6px rgba(245, 101, 101, 0.4) !important;
+    border-radius: 8px; /* Ensure radius is consistent */
+}
+
+/* Specificity for checkboxes to highlight the whole item */
+.checklist-item.highlight-gap {
+    background-color: #fff5f5; /* A light red background for the whole item */
+}

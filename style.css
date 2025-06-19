@@ -26,8 +26,6 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-
-
 .container {
     max-width: 900px;
     margin: 0 auto;
@@ -552,7 +550,7 @@ td input[type="text"] {
 
 /* Support Level Colors */
 .stakeholder-node.supporter { border-color: var(--success-color); background-color: #f0fff4; }
-.stakeholder-node.neutral   { border-color: var(--warning-color); background-color: #fffaf0; }
+.stakeholder-node.neutral { border-color: var(--warning-color); background-color: #fffaf0; }
 .stakeholder-node.detractor { border-color: var(--danger-color); background-color: #fff5f5; }
 
 .node-name {

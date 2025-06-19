@@ -173,31 +173,37 @@ document.addEventListener('DOMContentLoaded', () => {
         drawLines();
     };
 
-    const drawLines = () => {
-        // Now only clears lines, assumes <defs> is permanent in HTML
-        lineCanvas.innerHTML = lineCanvas.querySelector('defs')?.outerHTML || ''; 
-        stakeholderMapData.links.forEach(link => {
-            const sourceNodeEl = document.getElementById(`node-${link.source}`);
-            const targetNodeEl = document.getElementById(`node-${link.target}`);
-            if (!sourceNodeEl || !targetNodeEl) return;
-            const sourceRect = sourceNodeEl.getBoundingClientRect();
-            const targetRect = targetNodeEl.getBoundingClientRect();
-            const canvasRect = stakeholderCanvas.getBoundingClientRect();
-            const x1 = (sourceRect.left - canvasRect.left) + (sourceRect.width / 2);
-            const y1 = (sourceRect.top - canvasRect.top) + (sourceRect.height / 2);
-            const x2 = (targetRect.left - canvasRect.left) + (targetRect.width / 2);
-            const y2 = (targetRect.top - canvasRect.top) + (targetRect.height / 2);
-            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', x1);
-            line.setAttribute('y1', y1);
-            line.setAttribute('x2', x2);
-            line.setAttribute('y2', y2);
-            line.setAttribute('stroke', '#888');
-            line.setAttribute('stroke-width', '2');
-            line.setAttribute('marker-end', 'url(#arrowhead)');
-            lineCanvas.appendChild(line);
-        });
-    };
+   const drawLines = () => {
+    // FIX: This now intelligently clears only the lines, preserving the <defs>
+    const defs = lineCanvas.querySelector('defs')?.outerHTML;
+    lineCanvas.innerHTML = defs || ''; // Keep existing defs, or clear if none
+
+    stakeholderMapData.links.forEach(link => {
+        const sourceNodeEl = document.getElementById(`node-${link.source}`);
+        const targetNodeEl = document.getElementById(`node-${link.target}`);
+
+        if (!sourceNodeEl || !targetNodeEl) return;
+
+        const sourceRect = sourceNodeEl.getBoundingClientRect();
+        const targetRect = targetNodeEl.getBoundingClientRect();
+        const canvasRect = stakeholderCanvas.getBoundingClientRect();
+
+        const x1 = (sourceRect.left - canvasRect.left) + (sourceRect.width / 2);
+        const y1 = (sourceRect.top - canvasRect.top) + (sourceRect.height / 2);
+        const x2 = (targetRect.left - canvasRect.left) + (targetRect.width / 2);
+        const y2 = (targetRect.top - canvasRect.top) + (targetRect.height / 2);
+
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x1);
+        line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2);
+        line.setAttribute('y2', y2);
+        line.setAttribute('stroke', '#888');
+        line.setAttribute('stroke-width', '2');
+        line.setAttribute('marker-end', 'url(#arrowhead)');
+        lineCanvas.appendChild(line);
+    });
+};
 
     const onDragStart = (e) => {
         e.preventDefault();

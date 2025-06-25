@@ -741,6 +741,9 @@ ${JSON.stringify(dealData, null, 2)}
     document.addEventListener('DOMContentLoaded', () => {
     // ... (all your existing script.js code)
 
+    document.addEventListener('DOMContentLoaded', () => {
+    // ... (all your existing script.js code)
+
     // --- COLLAPSIBLE SECTIONS ---
     const legends = document.querySelectorAll('legend.collapsible');
     legends.forEach(legend => {

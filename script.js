@@ -72,10 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const initiateReportsTo = (nodeId) => {
-    isSelectingManager = true;
-    sourceNodeForLink = nodeId;
-    stakeholderCanvas.style.cursor = 'crosshair';
-};
+        isSelectingManager = true;
+        sourceNodeForLink = nodeId;
+        stakeholderCanvas.style.cursor = 'crosshair';
+    };
 
     const removeNode = (nodeId) => {
         if (confirm('Are you sure you want to remove this stakeholder?')) {
@@ -655,16 +655,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     analyzeBtn.addEventListener('click', async () => {
-    const dealData = getFormData();
-    if (!dealData.opportunityName) {
-        alert('Please fill out at least the Opportunity Name before analyzing.');
-        return;
-    }
-    analyzeBtn.textContent = 'Analyzing...';
-    analyzeBtn.disabled = true;
-    aiResponseContainer.innerHTML = 'Thinking... Please wait.';
-    modal.style.display = 'block';
-    const promptForAI = `You are an elite-level CRO (Chief Revenue Officer) at a top SaaS company, renowned for your sharp, insightful deal coaching. You are reviewing a deal for 'ScreenCloud', a digital signage solution. Your task is to go far beyond a surface-level review. You must synthesize the information provided, connect the dots between different data points, identify subtle risks, and provide a concrete, strategic action plan. Your advice should be the kind that turns a stalled deal into a closed-won opportunity.More actions
+        const dealData = getFormData();
+        if (!dealData.opportunityName) {
+            alert('Please fill out at least the Opportunity Name before analyzing.');
+            return;
+        }
+        analyzeBtn.textContent = 'Analyzing...';
+        analyzeBtn.disabled = true;
+        aiResponseContainer.innerHTML = 'Thinking... Please wait.';
+        modal.style.display = 'block';
+        const promptForAI = `You are an elite-level CRO (Chief Revenue Officer) at a top SaaS company, renowned for your sharp, insightful deal coaching. You are reviewing a deal for 'ScreenCloud', a digital signage solution. Your task is to go far beyond a surface-level review. You must synthesize the information provided, connect the dots between different data points, identify subtle risks, and provide a concrete, strategic action plan. Your advice should be the kind that turns a stalled deal into a closed-won opportunity.More actions
 
 Use the MEDDPICC sales qualification framework (Metrics, Economic Buyer, Decision Criteria, Decision Process, Paper Process, Identify Pain, Champion, Competition) as the mental model for your analysis of the data provided below.
 
@@ -690,27 +690,28 @@ Provide your coaching in the following, highly structured format:
 Here is the deal data to analyze:
 ${JSON.stringify(dealData, null, 2)}
 `;
-    try {
-        const response = await fetch('/.netlify/functions/analyze-deal', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                promptForAI: promptForAI
-            })
-        });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'The analysis failed.');
-        aiResponseContainer.textContent = result.choices[0].message.content;
-    } catch (error) {
-        console.error('AI Analysis Error:', error);
-        aiResponseContainer.textContent = `An error occurred. Error: ${error.message}`;
-    } finally {
-        analyzeBtn.textContent = 'Let AI Analyze';
-        analyzeBtn.disabled = false;
-    }
-});
+        try {
+            const response = await fetch('/.netlify/functions/analyze-deal', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    promptForAI: promptForAI
+                })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'The analysis failed.');
+            aiResponseContainer.textContent = result.choices[0].message.content;
+        } catch (error) {
+            console.error('AI Analysis Error:', error);
+            aiResponseContainer.textContent = `An error occurred. Error: ${error.message}`;
+        } finally {
+            analyzeBtn.textContent = 'Let AI Analyze';
+            analyzeBtn.disabled = false;
+        }
+    });
+
     loadSelectedDealBtn.addEventListener('click', async () => {
         const recordId = loadDealSelect.value;
         if (!recordId) return alert('Please select a deal from the list.');
@@ -735,16 +736,9 @@ ${JSON.stringify(dealData, null, 2)}
     
     loadModalCloseBtn.addEventListener('click', () => loadDealModal.style.display = 'none');
 
-    // --- INITIALIZATION ---
+    // --- INITIALIZATION & COLLAPSIBLE SECTIONS ---
     handleBudgetCheckboxChange();
 
-    document.addEventListener('DOMContentLoaded', () => {
-    // ... (all your existing script.js code)
-
-    document.addEventListener('DOMContentLoaded', () => {
-    // ... (all your existing script.js code)
-
-    // --- COLLAPSIBLE SECTIONS ---
     const legends = document.querySelectorAll('legend.collapsible');
     legends.forEach(legend => {
         const content = legend.nextElementSibling;
@@ -764,5 +758,5 @@ ${JSON.stringify(dealData, null, 2)}
             }
         });
     });
-});
+
 });

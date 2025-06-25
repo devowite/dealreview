@@ -331,10 +331,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- CORE FUNCTIONS ---
     const updateProgress = () => {
-        const visibleFields = allProgressFields.filter(field => field.offsetParent !== null);
-        const totalCount = visibleFields.length;
+        const totalCount = allProgressFields.length;
         let completedCount = 0;
-        visibleFields.forEach(field => {
+        allProgressFields.forEach(field => {
             if (field.type === 'checkbox') {
                 if (field.checked) {
                     completedCount++;
@@ -389,9 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         document.querySelectorAll('#interactive-checklist input[type="checkbox"]').forEach(cb => {
-            if (cb.offsetParent !== null) {
-                data[cb.name] = cb.checked;
-            }
+            data[cb.name] = cb.checked;
         });
 
         data.stakeholderMapData = JSON.stringify(stakeholderMapData);
@@ -570,8 +567,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     quickViewBtn.addEventListener('click', () => {
         quickViewContent.innerHTML = '';
-        const visibleFields = allProgressFields.filter(field => field.offsetParent !== null);
-        const visibleFieldNames = new Set(visibleFields.map(field => field.name));
         const fieldsets = form.querySelectorAll('fieldset');
 
         fieldsets.forEach(fieldset => {
@@ -590,7 +585,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const fieldsInSet = Array.from(fieldset.querySelectorAll('input, textarea'));
             fieldsInSet.forEach(field => {
-                if (!visibleFieldNames.has(field.name)) return;
+                if (allProgressFields.indexOf(field) === -1) return;
                 const labelEl = field.closest('.input-group, .checklist-item')?.querySelector('label');
                 if (!labelEl) return;
 
@@ -626,11 +621,12 @@ document.addEventListener('DOMContentLoaded', () => {
         quickViewModal.style.display = 'block';
     });
 
+
     quickViewModalCloseBtn.addEventListener('click', () => quickViewModal.style.display = 'none');
 
     showGapsBtn.addEventListener('click', () => {
         const isActive = showGapsBtn.dataset.active === 'true';
-        const visibleFields = allProgressFields.filter(field => field.offsetParent !== null);
+
         if (isActive) {
             showGapsBtn.textContent = 'Show Gaps';
             showGapsBtn.dataset.active = 'false';
@@ -640,7 +636,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showGapsBtn.textContent = 'Hide Gaps';
             showGapsBtn.dataset.active = 'true';
             showGapsBtn.style.backgroundColor = '#2D3748';
-            visibleFields.forEach(field => {
+            allProgressFields.forEach(field => {
                 let isGap = (field.type === 'checkbox') ? !field.checked : (!field.value || field.value.trim() === '');
                 if (isGap) {
                     let elementToHighlight = field;
@@ -649,6 +645,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (parentItem) elementToHighlight = parentItem;
                     }
                     elementToHighlight.classList.add('highlight-gap');
+                } else {
+                    let elementToUnhighlight = field;
+                    if (field.type === 'checkbox') {
+                        const parentItem = field.closest('.checklist-item');
+                        if (parentItem) elementToUnhighlight = parentItem;
+                    }
+                    elementToUnhighlight.classList.remove('highlight-gap');
                 }
             });
         }
@@ -755,8 +758,12 @@ ${JSON.stringify(dealData, null, 2)}
             legend.classList.toggle('collapsed');
             if (content && content.classList.contains('collapsible-content')) {
                 content.classList.toggle('collapsed');
+                // We no longer need to call updateProgress() here because
+                // the main functions now consider all fields.
             }
         });
     });
 
+    // Initial calculation
+    updateProgress();
 });

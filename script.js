@@ -737,4 +737,29 @@ ${JSON.stringify(dealData, null, 2)}
 
     // --- INITIALIZATION ---
     handleBudgetCheckboxChange();
+
+    document.addEventListener('DOMContentLoaded', () => {
+    // ... (all your existing script.js code)
+
+    // --- COLLAPSIBLE SECTIONS ---
+    const legends = document.querySelectorAll('legend.collapsible');
+    legends.forEach(legend => {
+        const content = legend.nextElementSibling;
+
+        // Start with all sections collapsed except for "Opportunity Details".
+        if (legend.textContent.trim() !== 'Opportunity Details') {
+            legend.classList.add('collapsed');
+            if (content && content.classList.contains('collapsible-content')) {
+                content.classList.add('collapsed');
+            }
+        }
+
+        legend.addEventListener('click', () => {
+            legend.classList.toggle('collapsed');
+            if (content && content.classList.contains('collapsible-content')) {
+                content.classList.toggle('collapsed');
+            }
+        });
+    });
+});
 });

@@ -679,3 +679,38 @@ td input[type="text"] {
     white-space: nowrap;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
+
+/* Add these styles to the end of your style.css file */
+
+legend.collapsible {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    user-select: none; /* Prevents text selection on click */
+}
+
+legend.collapsible::after {
+    content: '▼'; /* Down-pointing triangle for "open" state */
+    font-size: 0.8em;
+    padding-right: 10px;
+    transition: transform 0.2s ease-in-out;
+}
+
+legend.collapsible.collapsed::after {
+    transform: rotate(-90deg);
+}
+
+.collapsible-content {
+    display: block; /* Shown by default */
+    padding-top: 20px;
+    /* The transition for display is not directly possible, but this is a placeholder if you use height-based transitions */
+    transition: display 0.2s ease-in-out;
+}
+
+.collapsible-content.collapsed {
+    display: none;
+}
+
+

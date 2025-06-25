@@ -28,214 +28,230 @@
 
         <form id="deal-form">
             <fieldset>
-                <legend>Opportunity Details</legend>
-                <div class="grid-container">
-                    <div class="input-group">
-                        <label for="opportunityName">Opportunity Name</label>
-                        <input type="text" id="opportunityName" name="opportunityName">
+                <legend class="collapsible">Opportunity Details</legend>
+                <div class="collapsible-content">
+                    <div class="grid-container">
+                        <div class="input-group">
+                            <label for="opportunityName">Opportunity Name</label>
+                            <input type="text" id="opportunityName" name="opportunityName">
+                        </div>
+                        <div class="input-group">
+                            <label for="screens"># of Screens</label>
+                            <input type="number" id="screens" name="screens">
+                        </div>
+                        <div class="input-group">
+                            <label for="arr">ARR</label>
+                            <input type="number" id="arr" name="arr" placeholder="$">
+                        </div>
+                        <div class="input-group">
+                            <label for="closeDate">Projected Close Date</label>
+                            <input type="date" id="closeDate" name="closeDate">
+                        </div>
                     </div>
                     <div class="input-group">
-                        <label for="screens"># of Screens</label>
-                        <input type="number" id="screens" name="screens">
+                        <label for="useCase">Use Case</label>
+                        <textarea id="useCase" name="useCase" rows="3"></textarea>
                     </div>
                     <div class="input-group">
-                        <label for="arr">ARR</label>
-                        <input type="number" id="arr" name="arr" placeholder="$">
+                        <label for="reasonToAct">Compelling Reason to Act</label>
+                        <textarea id="reasonToAct" name="reasonToAct" rows="3"></textarea>
                     </div>
                     <div class="input-group">
-                        <label for="closeDate">Projected Close Date</label>
-                        <input type="date" id="closeDate" name="closeDate">
+                        <label for="risks">Risks</label>
+                        <textarea id="risks" name="risks" rows="3"></textarea>
                     </div>
-                </div>
-                <div class="input-group">
-                    <label for="useCase">Use Case</label>
-                    <textarea id="useCase" name="useCase" rows="3"></textarea>
-                </div>
-                <div class="input-group">
-                    <label for="reasonToAct">Compelling Reason to Act</label>
-                    <textarea id="reasonToAct" name="reasonToAct" rows="3"></textarea>
-                </div>
-                <div class="input-group">
-                    <label for="risks">Risks</label>
-                    <textarea id="risks" name="risks" rows="3"></textarea>
-                </div>
-                 <div class="grid-container">
-                    <div class="input-group">
-                        <label for="competition">Competition</label>
-                        <input type="text" id="competition" name="competition">
+                     <div class="grid-container">
+                        <div class="input-group">
+                            <label for="competition">Competition</label>
+                            <input type="text" id="competition" name="competition">
+                        </div>
+                        <div class="input-group">
+                            <label for="incumbent">Incumbent</label>
+                            <input type="text" id="incumbent" name="incumbent">
+                        </div>
+                         <div class="input-group">
+                            <label for="partners">Partners in Play</label>
+                            <input type="text" id="partners" name="partners">
+                        </div>
                     </div>
                     <div class="input-group">
-                        <label for="incumbent">Incumbent</label>
-                        <input type="text" id="incumbent" name="incumbent">
+                        <label for="similarCustomers">Similar Customers (Industry or Use Case)</label>
+                        <input type="text" id="similarCustomers" name="similarCustomers">
                     </div>
-                     <div class="input-group">
-                        <label for="partners">Partners in Play</label>
-                        <input type="text" id="partners" name="partners">
+                    <div class="input-group">
+                        <label>Path to Close</label>
+                        <div id="path-to-close-container">
+                            <div class="path-item"><input type="text" name="path-to-close[]" placeholder="Enter a step..."></div>
+                        </div>
+                        <button type="button" id="add-path-step" class="add-button">+ Add Step</button>
                     </div>
-                </div>
-                <div class="input-group">
-                    <label for="similarCustomers">Similar Customers (Industry or Use Case)</label>
-                    <input type="text" id="similarCustomers" name="similarCustomers">
-                </div>
-                <div class="input-group">
-                    <label>Path to Close</label>
-                    <div id="path-to-close-container">
-                        <div class="path-item"><input type="text" name="path-to-close[]" placeholder="Enter a step..."></div>
-                    </div>
-                    <button type="button" id="add-path-step" class="add-button">+ Add Step</button>
                 </div>
             </fieldset>
 
             <fieldset>
-                <legend>Key Stakeholders</legend>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Role</th>
-                                <th>Name</th>
-                                <th>Title</th>
-                                <th>Sponsor</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Champion</td>
-                                <td><input type="text" id="championName" name="championName"></td>
-                                <td><input type="text" id="championTitle" name="championTitle"></td>
-                                <td><input type="text" id="championSponsor" name="championSponsor"></td>
-                            </tr>
-                            <tr>
-                                <td>Economic Buyer</td>
-                                <td><input type="text" id="economicBuyerName" name="economicBuyerName"></td>
-                                <td><input type="text" id="economicBuyerTitle" name="economicBuyerTitle"></td>
-                                <td><input type="text" id="economicBuyerSponsor" name="economicBuyerSponsor"></td>
-                            </tr>
-                            <tr>
-                                <td>Legal/Procurement</td>
-                                <td><input type="text" id="legalName" name="legalName"></td>
-                                <td><input type="text" id="legalTitle" name="legalTitle"></td>
-                                <td><input type="text" id="legalSponsor" name="legalSponsor"></td>
-                            </tr>
-                            <tr>
-                                <td>IT/Cybersecurity</td>
-                                <td><input type="text" id="itName" name="itName"></td>
-                                <td><input type="text" id="itTitle" name="itTitle"></td>
-                                <td><input type="text" id="itSponsor" name="itSponsor"></td>
-                            </tr>
-                             <tr>
-                                <td>Executive Sponsor</td>
-                                <td><input type="text" id="execSponsorName" name="execSponsorName"></td>
-                                <td><input type="text" id="execSponsorTitle" name="execSponsorTitle"></td>
-                                <td><input type="text" id="execSponsorSponsor" name="execSponsorSponsor"></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <legend class="collapsible">Key Stakeholders</legend>
+                <div class="collapsible-content">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Role</th>
+                                    <th>Name</th>
+                                    <th>Title</th>
+                                    <th>Sponsor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Champion</td>
+                                    <td><input type="text" id="championName" name="championName"></td>
+                                    <td><input type="text" id="championTitle" name="championTitle"></td>
+                                    <td><input type="text" id="championSponsor" name="championSponsor"></td>
+                                </tr>
+                                <tr>
+                                    <td>Economic Buyer</td>
+                                    <td><input type="text" id="economicBuyerName" name="economicBuyerName"></td>
+                                    <td><input type="text" id="economicBuyerTitle" name="economicBuyerTitle"></td>
+                                    <td><input type="text" id="economicBuyerSponsor" name="economicBuyerSponsor"></td>
+                                </tr>
+                                <tr>
+                                    <td>Legal/Procurement</td>
+                                    <td><input type="text" id="legalName" name="legalName"></td>
+                                    <td><input type="text" id="legalTitle" name="legalTitle"></td>
+                                    <td><input type="text" id="legalSponsor" name="legalSponsor"></td>
+                                </tr>
+                                <tr>
+                                    <td>IT/Cybersecurity</td>
+                                    <td><input type="text" id="itName" name="itName"></td>
+                                    <td><input type="text" id="itTitle" name="itTitle"></td>
+                                    <td><input type="text" id="itSponsor" name="itSponsor"></td>
+                                </tr>
+                                 <tr>
+                                    <td>Executive Sponsor</td>
+                                    <td><input type="text" id="execSponsorName" name="execSponsorName"></td>
+                                    <td><input type="text" id="execSponsorTitle" name="execSponsorTitle"></td>
+                                    <td><input type="text" id="execSponsorSponsor" name="execSponsorSponsor"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </fieldset>
 
             <div id="interactive-checklist">
                 <fieldset>
-                    <legend>Business Need & Urgency</legend>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_hasNeed">Is the prospect currently using digital signage (even if it's a legacy or homegrown solution), or have they identified a clear need for it?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_hasComms">Does the company have a defined internal communications, HR, or operations function that is responsible for employee engagement?</label></div>
-                    <div class="checklist-item with-text">
-                        <label><input type="checkbox" name="chk_canArticulatePain">Can you clearly articulate the top 1-3 business pains this deal solves, using the prospect's own words?</label>
-                        <textarea name="txt_businessPains" rows="3" placeholder="1. ...&#10;2. ...&#10;3. ..."></textarea>
-                    </div>
-                    <div class="checklist-item with-text">
-                        <label><input type="checkbox" name="chk_prospectAgreedPain">Has the prospect acknowledged and agreed upon these specific pain points and the negative consequences of inaction?</label>
-                        <textarea name="txt_painConsequences" rows="2" placeholder="Note consequences discussed..."></textarea>
-                    </div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_useCasesConfirmed">Have the primary use cases been confirmed (e.g., improving internal comms, boosting employee morale, displaying safety information, showing performance dashboards)?</label></div>
-                     <div class="checklist-item"><label><input type="checkbox" name="chk_isCompellingEvent">Is this deal tied to a compelling event with a firm date (e.g., a new office opening, a company-wide town hall, a seasonal push)?</label></div>
-                </fieldset>
-
-                <fieldset>
-                    <legend>Stakeholder Alignment</legend>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_hasChampion">Have you identified a champion who is not only bought in but also has the influence to drive this project forward internally?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_championArticulatesValue">Has your champion successfully articulated the value of ScreenCloud to other stakeholders without you present?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_championPurchased">Has your champion purchased software at this company before?</label></div>
-                    <div class="checklist-item with-text">
-                        <label><input type="checkbox" name="chk_championHasStake">Does your champion have a personal stake in the success of this project (e.g., it's tied to their MBOs, KPIs, or a strategic company initiative)?</label>
-                        <textarea name="txt_championStake" rows="2" placeholder="e.g., MBOs, KPIs, Strategic Initiatives..."></textarea>
-                    </div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_mappedCommittee">Have you mapped out the full buying committee, including the economic buyer, technical buyer, and key influencers?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_isMultiThreaded">Do you have multi-threaded relationships, with at least two or more key contacts in different roles engaged in the evaluation?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_understandMotivations">Do I understand the personal motivations of each key stakeholder involved?</label></div>
-                </fieldset>
-
-                <fieldset>
-                    <legend>Solution, Value & Competition</legend>
-                    <div class="checklist-item with-text">
-                        <label><input type="checkbox" name="chk_isAligned">Is there a clear alignment between our proposed solution and a top-level company initiative or strategic goal for this year?</label>
-                        <textarea name="txt_solutionAlignment" rows="2" placeholder="Note the specific company goal..."></textarea>
-                    </div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_isValueQuantified">Has the value of solving this problem been quantified or estimated in a way that resonates with the economic buyer?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_builtBusinessCase">Have you collaborated with your champion to build a business case or ROI calculation they can use internally?</label></div>
-                    <div class="checklist-item with-text">
-                        <label><input type="checkbox" name="chk_identifiedKillerApps">Have you identified the 2-3 'killer apps' or other components that would make ScreenCloud the preferred choice?</label>
-                        <textarea name="txt_killerApps" rows="2" placeholder="List the key components..."></textarea>
-                    </div>
-                    <div class="checklist-item with-text">
-                        <label><input type="checkbox" name="chk_identifiedCompetition">Have you identified any competition on this deal? If so, who are they and where do we win and lose for each?</label>
-                        <textarea name="txt_competitionAnalysis" rows="2" placeholder="Competitor: ..., Win reason: ..., Lose reason: ..."></textarea>
+                    <legend class="collapsible">Business Need & Urgency</legend>
+                    <div class="collapsible-content">
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_hasNeed">Is the prospect currently using digital signage (even if it's a legacy or homegrown solution), or have they identified a clear need for it?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_hasComms">Does the company have a defined internal communications, HR, or operations function that is responsible for employee engagement?</label></div>
+                        <div class="checklist-item with-text">
+                            <label><input type="checkbox" name="chk_canArticulatePain">Can you clearly articulate the top 1-3 business pains this deal solves, using the prospect's own words?</label>
+                            <textarea name="txt_businessPains" rows="3" placeholder="1. ...&#10;2. ...&#10;3. ..."></textarea>
+                        </div>
+                        <div class="checklist-item with-text">
+                            <label><input type="checkbox" name="chk_prospectAgreedPain">Has the prospect acknowledged and agreed upon these specific pain points and the negative consequences of inaction?</label>
+                            <textarea name="txt_painConsequences" rows="2" placeholder="Note consequences discussed..."></textarea>
+                        </div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_useCasesConfirmed">Have the primary use cases been confirmed (e.g., improving internal comms, boosting employee morale, displaying safety information, showing performance dashboards)?</label></div>
+                         <div class="checklist-item"><label><input type="checkbox" name="chk_isCompellingEvent">Is this deal tied to a compelling event with a firm date (e.g., a new office opening, a company-wide town hall, a seasonal push)?</label></div>
                     </div>
                 </fieldset>
 
                 <fieldset>
-                    <legend>Budget & Procurement</legend>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_hasBudget">Has the prospect confirmed they have an allocated budget for this project?</label></div>
-                    <div id="no-budget-question-wrapper">
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_economicBuyerCanSecureFunds">If no formal budget exists, has the economic buyer confirmed they have the authority and willingness to secure funds for this initiative?</label></div>
+                    <legend class="collapsible">Stakeholder Alignment</legend>
+                    <div class="collapsible-content">
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_hasChampion">Have you identified a champion who is not only bought in but also has the influence to drive this project forward internally?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_championArticulatesValue">Has your champion successfully articulated the value of ScreenCloud to other stakeholders without you present?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_championPurchased">Has your champion purchased software at this company before?</label></div>
+                        <div class="checklist-item with-text">
+                            <label><input type="checkbox" name="chk_championHasStake">Does your champion have a personal stake in the success of this project (e.g., it's tied to their MBOs, KPIs, or a strategic company initiative)?</label>
+                            <textarea name="txt_championStake" rows="2" placeholder="e.g., MBOs, KPIs, Strategic Initiatives..."></textarea>
+                        </div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_mappedCommittee">Have you mapped out the full buying committee, including the economic buyer, technical buyer, and key influencers?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_isMultiThreaded">Do you have multi-threaded relationships, with at least two or more key contacts in different roles engaged in the evaluation?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_understandMotivations">Do I understand the personal motivations of each key stakeholder involved?</label></div>
                     </div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_pricingDiscussed">Have pricing discussions taken place, and does the prospect understand our pricing model and the value it provides?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_uncoveredBudgetProcess">Have you uncovered the process and timeline for budget approval?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_identifiedLegalReviewer">Have you identified the individual or team responsible for procurement and legal review?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_reviewedMSA">Has the prospect reviewed our standard Master Service Agreement (MSA) or provided their own for review?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_understandSignOff">Do you have a clear understanding of their sign-off process, including all the necessary steps and signatories?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_setProcurementTimeline">Have you proactively set expectations on the timeline for the procurement and legal stages?</label></div>
                 </fieldset>
 
                 <fieldset>
-                    <legend>Technical Fit & Timeline</legend>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_confirmedDevices">Has the prospect confirmed the types and number of devices (e.g., TVs, media players) they plan to use?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_engagedIT">Have you engaged with their IT/technical team to discuss requirements and address potential concerns?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_criticalIntegrations">Have any critical integrations (e.g., with internal dashboards, social media, or communication tools) been identified and confirmed as feasible?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_securityReviewed">Has our security documentation been reviewed and have we proactively addressed any potential security or compliance blockers?</label></div>
-                     <div class="checklist-item"><label><input type="checkbox" name="chk_complianceAddressed">Have any compliance, data privacy, or regulatory requirements been identified and addressed?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_hardwarePlan">Is there a clear plan for hardware procurement and installation, if required?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_hasLaunchDate">Has the prospect provided a specific, desired launch date for the project?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_agreedClosePlan">Have you and the prospect mutually agreed on a close plan with key milestones and dates?</label></div>
+                    <legend class="collapsible">Solution, Value & Competition</legend>
+                    <div class="collapsible-content">
+                        <div class="checklist-item with-text">
+                            <label><input type="checkbox" name="chk_isAligned">Is there a clear alignment between our proposed solution and a top-level company initiative or strategic goal for this year?</label>
+                            <textarea name="txt_solutionAlignment" rows="2" placeholder="Note the specific company goal..."></textarea>
+                        </div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_isValueQuantified">Has the value of solving this problem been quantified or estimated in a way that resonates with the economic buyer?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_builtBusinessCase">Have you collaborated with your champion to build a business case or ROI calculation they can use internally?</label></div>
+                        <div class="checklist-item with-text">
+                            <label><input type="checkbox" name="chk_identifiedKillerApps">Have you identified the 2-3 'killer apps' or other components that would make ScreenCloud the preferred choice?</label>
+                            <textarea name="txt_killerApps" rows="2" placeholder="List the key components..."></textarea>
+                        </div>
+                        <div class="checklist-item with-text">
+                            <label><input type="checkbox" name="chk_identifiedCompetition">Have you identified any competition on this deal? If so, who are they and where do we win and lose for each?</label>
+                            <textarea name="txt_competitionAnalysis" rows="2" placeholder="Competitor: ..., Win reason: ..., Lose reason: ..."></textarea>
+                        </div>
+                    </div>
                 </fieldset>
 
                 <fieldset>
-                    <legend>Self-Reflection & Risk Mitigation</legend>
-                    <div class="checklist-item with-text">
-                        <label><input type="checkbox" name="chk_riskOfStall">What is the risk of this deal stalling or being pushed to the next quarter? Have you identified and mitigated these risks?</label>
-                        <textarea name="txt_stallRisk" rows="2" placeholder="Risk: ... Mitigation: ..."></textarea>
+                    <legend class="collapsible">Budget & Procurement</legend>
+                    <div class="collapsible-content">
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_hasBudget">Has the prospect confirmed they have an allocated budget for this project?</label></div>
+                        <div id="no-budget-question-wrapper">
+                            <div class="checklist-item"><label><input type="checkbox" name="chk_economicBuyerCanSecureFunds">If no formal budget exists, has the economic buyer confirmed they have the authority and willingness to secure funds for this initiative?</label></div>
+                        </div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_pricingDiscussed">Have pricing discussions taken place, and does the prospect understand our pricing model and the value it provides?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_uncoveredBudgetProcess">Have you uncovered the process and timeline for budget approval?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_identifiedLegalReviewer">Have you identified the individual or team responsible for procurement and legal review?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_reviewedMSA">Has the prospect reviewed our standard Master Service Agreement (MSA) or provided their own for review?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_understandSignOff">Do you have a clear understanding of their sign-off process, including all the necessary steps and signatories?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_setProcurementTimeline">Have you proactively set expectations on the timeline for the procurement and legal stages?</label></div>
                     </div>
-                    <div class="checklist-item with-text">
-                        <label><input type="checkbox" name="chk_prospectAcknowledgedDelayConsequences">Has the prospect acknowledged the negative consequences of delaying this decision?</label>
-                        <textarea name="txt_delayConsequences" rows="2" placeholder="Note consequences of delay..."></textarea>
+                </fieldset>
+
+                <fieldset>
+                    <legend class="collapsible">Technical Fit & Timeline</legend>
+                    <div class="collapsible-content">
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_confirmedDevices">Has the prospect confirmed the types and number of devices (e.g., TVs, media players) they plan to use?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_engagedIT">Have you engaged with their IT/technical team to discuss requirements and address potential concerns?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_criticalIntegrations">Have any critical integrations (e.g., with internal dashboards, social media, or communication tools) been identified and confirmed as feasible?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_securityReviewed">Has our security documentation been reviewed and have we proactively addressed any potential security or compliance blockers?</label></div>
+                         <div class="checklist-item"><label><input type="checkbox" name="chk_complianceAddressed">Have any compliance, data privacy, or regulatory requirements been identified and addressed?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_hardwarePlan">Is there a clear plan for hardware procurement and installation, if required?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_hasLaunchDate">Has the prospect provided a specific, desired launch date for the project?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_agreedClosePlan">Have you and the prospect mutually agreed on a close plan with key milestones and dates?</label></div>
                     </div>
-                    <div class="checklist-item with-text">
-                        <label><input type="checkbox" name="chk_championLeaving">If my champion left the company tomorrow, would this deal survive? Why?</label>
-                         <textarea name="txt_championLeaveWhy" rows="2" placeholder="Why or why not?"></textarea>
-                    </div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_forecastingOnEvidence">Am I forecasting this deal based on concrete evidence from the buyer instead of my own hope and assumptions?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_earnedTheRight">Have I truly earned the right to ask for the business at this stage?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_isStrategicConsultant">Am I acting as a strategic consultant rather than just a vendor responding to requests?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_ghostWritten">Have I ghost-written the internal justification document for my champion to use?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_prospectPushing">Is the prospect pushing me for information and next steps, or am I constantly chasing them?</label></div>
-                    <div class="checklist-item"><label><input type="checkbox" name="chk_isDerisked">Have I done everything in my power to de-risk this deal for the buyer?</label></div>
-                     <div class="checklist-item with-text">
-                        <label>What is the one thing that could kill this deal that I'm not currently thinking about?</label>
-                         <textarea name="txt_killDeal" rows="2"></textarea>
-                    </div>
-                    <div class="checklist-item with-text">
-                        <label>If I were the buyer, what would my biggest hesitation be at this point?</label>
-                         <textarea name="txt_buyerHesitation" rows="2"></textarea>
+                </fieldset>
+
+                <fieldset>
+                    <legend class="collapsible">Self-Reflection & Risk Mitigation</legend>
+                    <div class="collapsible-content">
+                        <div class="checklist-item with-text">
+                            <label><input type="checkbox" name="chk_riskOfStall">What is the risk of this deal stalling or being pushed to the next quarter? Have you identified and mitigated these risks?</label>
+                            <textarea name="txt_stallRisk" rows="2" placeholder="Risk: ... Mitigation: ..."></textarea>
+                        </div>
+                        <div class="checklist-item with-text">
+                            <label><input type="checkbox" name="chk_prospectAcknowledgedDelayConsequences">Has the prospect acknowledged the negative consequences of delaying this decision?</label>
+                            <textarea name="txt_delayConsequences" rows="2" placeholder="Note consequences of delay..."></textarea>
+                        </div>
+                        <div class="checklist-item with-text">
+                            <label><input type="checkbox" name="chk_championLeaving">If my champion left the company tomorrow, would this deal survive? Why?</label>
+                             <textarea name="txt_championLeaveWhy" rows="2" placeholder="Why or why not?"></textarea>
+                        </div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_forecastingOnEvidence">Am I forecasting this deal based on concrete evidence from the buyer instead of my own hope and assumptions?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_earnedTheRight">Have I truly earned the right to ask for the business at this stage?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_isStrategicConsultant">Am I acting as a strategic consultant rather than just a vendor responding to requests?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_ghostWritten">Have I ghost-written the internal justification document for my champion to use?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_prospectPushing">Is the prospect pushing me for information and next steps, or am I constantly chasing them?</label></div>
+                        <div class="checklist-item"><label><input type="checkbox" name="chk_isDerisked">Have I done everything in my power to de-risk this deal for the buyer?</label></div>
+                         <div class="checklist-item with-text">
+                            <label>What is the one thing that could kill this deal that I'm not currently thinking about?</label>
+                             <textarea name="txt_killDeal" rows="2"></textarea>
+                        </div>
+                        <div class="checklist-item with-text">
+                            <label>If I were the buyer, what would my biggest hesitation be at this point?</label>
+                             <textarea name="txt_buyerHesitation" rows="2"></textarea>
+                        </div>
                     </div>
                 </fieldset>
             </div>

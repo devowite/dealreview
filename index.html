@@ -3,332 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ScreenCloud Deal Checklist</title>
-    <link rel="stylesheet" href="style.css">
+    <title>College Football 26 Dynasty Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body>
-    <div class="container">
-        <header>
-            <div class="header-content">
-                <div>
-                    <h1>Deal Checklist</h1>
-                    <button type="button" id="stakeholder-map-btn" class="add-button" style="margin-left: 0; margin-top: 10px;">Stakeholder Map</button>
-                </div>
-                <div class="top-action-buttons">
-                    <button type="button" id="show-gaps-btn">Show Gaps</button>
-                    <button type="button" id="quick-view-btn">Quick View</button>
-                    <button type="button" id="save-deal-btn">Save Deal</button>
-                    <button type="button" id="load-deal-btn">Load Deal</button>
-                </div>
-            </div>
-        </header>
+<body class="bg-gray-900 text-white antialiased">
 
-        <form id="deal-form">
-            <fieldset>
-                <legend class="collapsible">Opportunity Details</legend>
-                <div class="collapsible-content">
-                    <div class="grid-container">
-                        <div class="input-group">
-                            <label for="opportunityName">Opportunity Name</label>
-                            <input type="text" id="opportunityName" name="opportunityName">
-                        </div>
-                        <div class="input-group">
-                            <label for="screens"># of Screens</label>
-                            <input type="number" id="screens" name="screens">
-                        </div>
-                        <div class="input-group">
-                            <label for="arr">ARR</label>
-                            <input type="number" id="arr" name="arr" placeholder="$">
-                        </div>
-                        <div class="input-group">
-                            <label for="closeDate">Projected Close Date</label>
-                            <input type="date" id="closeDate" name="closeDate">
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label for="useCase">Use Case</label>
-                        <textarea id="useCase" name="useCase" rows="3"></textarea>
-                    </div>
-                    <div class="input-group">
-                        <label for="reasonToAct">Compelling Reason to Act</label>
-                        <textarea id="reasonToAct" name="reasonToAct" rows="3"></textarea>
-                    </div>
-                    <div class="input-group">
-                        <label for="risks">Risks</label>
-                        <textarea id="risks" name="risks" rows="3"></textarea>
-                    </div>
-                     <div class="grid-container">
-                        <div class="input-group">
-                            <label for="competition">Competition</label>
-                            <input type="text" id="competition" name="competition">
-                        </div>
-                        <div class="input-group">
-                            <label for="incumbent">Incumbent</label>
-                            <input type="text" id="incumbent" name="incumbent">
-                        </div>
-                         <div class="input-group">
-                            <label for="partners">Partners in Play</label>
-                            <input type="text" id="partners" name="partners">
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label for="similarCustomers">Similar Customers (Industry or Use Case)</label>
-                        <input type="text" id="similarCustomers" name="similarCustomers">
-                    </div>
-                    <div class="input-group">
-                        <label>Path to Close</label>
-                        <div id="path-to-close-container">
-                            <div class="path-item"><input type="text" name="path-to-close[]" placeholder="Enter a step..."></div>
-                        </div>
-                        <button type="button" id="add-path-step" class="add-button">+ Add Step</button>
-                    </div>
-                </div>
-            </fieldset>
-
-            <fieldset>
-                <legend class="collapsible">Key Stakeholders</legend>
-                <div class="collapsible-content">
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Role</th>
-                                    <th>Name</th>
-                                    <th>Title</th>
-                                    <th>Sponsor</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Champion</td>
-                                    <td><input type="text" id="championName" name="championName"></td>
-                                    <td><input type="text" id="championTitle" name="championTitle"></td>
-                                    <td><input type="text" id="championSponsor" name="championSponsor"></td>
-                                </tr>
-                                <tr>
-                                    <td>Economic Buyer</td>
-                                    <td><input type="text" id="economicBuyerName" name="economicBuyerName"></td>
-                                    <td><input type="text" id="economicBuyerTitle" name="economicBuyerTitle"></td>
-                                    <td><input type="text" id="economicBuyerSponsor" name="economicBuyerSponsor"></td>
-                                </tr>
-                                <tr>
-                                    <td>Legal/Procurement</td>
-                                    <td><input type="text" id="legalName" name="legalName"></td>
-                                    <td><input type="text" id="legalTitle" name="legalTitle"></td>
-                                    <td><input type="text" id="legalSponsor" name="legalSponsor"></td>
-                                </tr>
-                                <tr>
-                                    <td>IT/Cybersecurity</td>
-                                    <td><input type="text" id="itName" name="itName"></td>
-                                    <td><input type="text" id="itTitle" name="itTitle"></td>
-                                    <td><input type="text" id="itSponsor" name="itSponsor"></td>
-                                </tr>
-                                 <tr>
-                                    <td>Executive Sponsor</td>
-                                    <td><input type="text" id="execSponsorName" name="execSponsorName"></td>
-                                    <td><input type="text" id="execSponsorTitle" name="execSponsorTitle"></td>
-                                    <td><input type="text" id="execSponsorSponsor" name="execSponsorSponsor"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </fieldset>
-
-            <div id="interactive-checklist">
-                <fieldset>
-                    <legend class="collapsible">Business Need & Urgency</legend>
-                    <div class="collapsible-content">
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_hasNeed">Is the prospect currently using digital signage (even if it's a legacy or homegrown solution), or have they identified a clear need for it?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_hasComms">Does the company have a defined internal communications, HR, or operations function that is responsible for employee engagement?</label></div>
-                        <div class="checklist-item with-text">
-                            <label><input type="checkbox" name="chk_canArticulatePain">Can you clearly articulate the top 1-3 business pains this deal solves, using the prospect's own words?</label>
-                            <textarea name="txt_businessPains" rows="3" placeholder="1. ...&#10;2. ...&#10;3. ..."></textarea>
-                        </div>
-                        <div class="checklist-item with-text">
-                            <label><input type="checkbox" name="chk_prospectAgreedPain">Has the prospect acknowledged and agreed upon these specific pain points and the negative consequences of inaction?</label>
-                            <textarea name="txt_painConsequences" rows="2" placeholder="Note consequences discussed..."></textarea>
-                        </div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_useCasesConfirmed">Have the primary use cases been confirmed (e.g., improving internal comms, boosting employee morale, displaying safety information, showing performance dashboards)?</label></div>
-                         <div class="checklist-item"><label><input type="checkbox" name="chk_isCompellingEvent">Is this deal tied to a compelling event with a firm date (e.g., a new office opening, a company-wide town hall, a seasonal push)?</label></div>
-                    </div>
-                </fieldset>
-
-                <fieldset>
-                    <legend class="collapsible">Stakeholder Alignment</legend>
-                    <div class="collapsible-content">
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_hasChampion">Have you identified a champion who is not only bought in but also has the influence to drive this project forward internally?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_championArticulatesValue">Has your champion successfully articulated the value of ScreenCloud to other stakeholders without you present?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_championPurchased">Has your champion purchased software at this company before?</label></div>
-                        <div class="checklist-item with-text">
-                            <label><input type="checkbox" name="chk_championHasStake">Does your champion have a personal stake in the success of this project (e.g., it's tied to their MBOs, KPIs, or a strategic company initiative)?</label>
-                            <textarea name="txt_championStake" rows="2" placeholder="e.g., MBOs, KPIs, Strategic Initiatives..."></textarea>
-                        </div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_mappedCommittee">Have you mapped out the full buying committee, including the economic buyer, technical buyer, and key influencers?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_isMultiThreaded">Do you have multi-threaded relationships, with at least two or more key contacts in different roles engaged in the evaluation?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_understandMotivations">Do I understand the personal motivations of each key stakeholder involved?</label></div>
-                    </div>
-                </fieldset>
-
-                <fieldset>
-                    <legend class="collapsible">Solution, Value & Competition</legend>
-                    <div class="collapsible-content">
-                        <div class="checklist-item with-text">
-                            <label><input type="checkbox" name="chk_isAligned">Is there a clear alignment between our proposed solution and a top-level company initiative or strategic goal for this year?</label>
-                            <textarea name="txt_solutionAlignment" rows="2" placeholder="Note the specific company goal..."></textarea>
-                        </div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_isValueQuantified">Has the value of solving this problem been quantified or estimated in a way that resonates with the economic buyer?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_builtBusinessCase">Have you collaborated with your champion to build a business case or ROI calculation they can use internally?</label></div>
-                        <div class="checklist-item with-text">
-                            <label><input type="checkbox" name="chk_identifiedKillerApps">Have you identified the 2-3 'killer apps' or other components that would make ScreenCloud the preferred choice?</label>
-                            <textarea name="txt_killerApps" rows="2" placeholder="List the key components..."></textarea>
-                        </div>
-                        <div class="checklist-item with-text">
-                            <label><input type="checkbox" name="chk_identifiedCompetition">Have you identified any competition on this deal? If so, who are they and where do we win and lose for each?</label>
-                            <textarea name="txt_competitionAnalysis" rows="2" placeholder="Competitor: ..., Win reason: ..., Lose reason: ..."></textarea>
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset>
-                    <legend class="collapsible">Budget & Procurement</legend>
-                    <div class="collapsible-content">
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_hasBudget">Has the prospect confirmed they have an allocated budget for this project?</label></div>
-                        <div id="no-budget-question-wrapper">
-                            <div class="checklist-item"><label><input type="checkbox" name="chk_economicBuyerCanSecureFunds">If no formal budget exists, has the economic buyer confirmed they have the authority and willingness to secure funds for this initiative?</label></div>
-                        </div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_pricingDiscussed">Have pricing discussions taken place, and does the prospect understand our pricing model and the value it provides?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_uncoveredBudgetProcess">Have you uncovered the process and timeline for budget approval?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_identifiedLegalReviewer">Have you identified the individual or team responsible for procurement and legal review?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_reviewedMSA">Has the prospect reviewed our standard Master Service Agreement (MSA) or provided their own for review?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_understandSignOff">Do you have a clear understanding of their sign-off process, including all the necessary steps and signatories?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_setProcurementTimeline">Have you proactively set expectations on the timeline for the procurement and legal stages?</label></div>
-                    </div>
-                </fieldset>
-
-                <fieldset>
-                    <legend class="collapsible">Technical Fit & Timeline</legend>
-                    <div class="collapsible-content">
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_confirmedDevices">Has the prospect confirmed the types and number of devices (e.g., TVs, media players) they plan to use?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_engagedIT">Have you engaged with their IT/technical team to discuss requirements and address potential concerns?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_criticalIntegrations">Have any critical integrations (e.g., with internal dashboards, social media, or communication tools) been identified and confirmed as feasible?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_securityReviewed">Has our security documentation been reviewed and have we proactively addressed any potential security or compliance blockers?</label></div>
-                         <div class="checklist-item"><label><input type="checkbox" name="chk_complianceAddressed">Have any compliance, data privacy, or regulatory requirements been identified and addressed?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_hardwarePlan">Is there a clear plan for hardware procurement and installation, if required?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_hasLaunchDate">Has the prospect provided a specific, desired launch date for the project?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_agreedClosePlan">Have you and the prospect mutually agreed on a close plan with key milestones and dates?</label></div>
-                    </div>
-                </fieldset>
-
-                <fieldset>
-                    <legend class="collapsible">Self-Reflection & Risk Mitigation</legend>
-                    <div class="collapsible-content">
-                        <div class="checklist-item with-text">
-                            <label><input type="checkbox" name="chk_riskOfStall">What is the risk of this deal stalling or being pushed to the next quarter? Have you identified and mitigated these risks?</label>
-                            <textarea name="txt_stallRisk" rows="2" placeholder="Risk: ... Mitigation: ..."></textarea>
-                        </div>
-                        <div class="checklist-item with-text">
-                            <label><input type="checkbox" name="chk_prospectAcknowledgedDelayConsequences">Has the prospect acknowledged the negative consequences of delaying this decision?</label>
-                            <textarea name="txt_delayConsequences" rows="2" placeholder="Note consequences of delay..."></textarea>
-                        </div>
-                        <div class="checklist-item with-text">
-                            <label><input type="checkbox" name="chk_championLeaving">If my champion left the company tomorrow, would this deal survive? Why?</label>
-                             <textarea name="txt_championLeaveWhy" rows="2" placeholder="Why or why not?"></textarea>
-                        </div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_forecastingOnEvidence">Am I forecasting this deal based on concrete evidence from the buyer instead of my own hope and assumptions?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_earnedTheRight">Have I truly earned the right to ask for the business at this stage?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_isStrategicConsultant">Am I acting as a strategic consultant rather than just a vendor responding to requests?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_ghostWritten">Have I ghost-written the internal justification document for my champion to use?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_prospectPushing">Is the prospect pushing me for information and next steps, or am I constantly chasing them?</label></div>
-                        <div class="checklist-item"><label><input type="checkbox" name="chk_isDerisked">Have I done everything in my power to de-risk this deal for the buyer?</label></div>
-                         <div class="checklist-item with-text">
-                            <label>What is the one thing that could kill this deal that I'm not currently thinking about?</label>
-                             <textarea name="txt_killDeal" rows="2"></textarea>
-                        </div>
-                        <div class="checklist-item with-text">
-                            <label>If I were the buyer, what would my biggest hesitation be at this point?</label>
-                             <textarea name="txt_buyerHesitation" rows="2"></textarea>
-                        </div>
-                    </div>
-                </fieldset>
-            </div>
-
-            <div class="action-buttons">
-                <button type="button" id="analyze-deal-btn">Let AI Analyze</button>
-            </div>
-        </form>
-
-        <div id="ai-modal" class="modal">
-            <div class="modal-content">
-                <span class="close-button">&times;</span>
-                <h2>AI Deal Analysis</h2>
-                <div id="ai-response"></div>
-            </div>
-        </div>
-    </div> <div id="load-deal-modal" class="modal">
-        <div class="modal-content">
-            <span id="load-modal-close-btn" class="close-button">&times;</span>
-            <h2>Select a Deal to Load</h2>
-            <div id="load-modal-body">
-                <select id="load-deal-select" name="load-deal-select">
-                    <option value="">Loading deals...</option>
-                </select>
-                <button type="button" id="load-selected-deal-btn">Load Selected Deal</button>
-            </div>
-            <div id="load-modal-error" style="color: var(--danger-color); margin-top: 15px;"></div>
-        </div>
-    </div>
-
-    <div id="quick-view-modal" class="modal">
-        <div class="modal-content">
-            <span id="quick-view-modal-close-btn" class="close-button">&times;</span>
-            <h2>Deal Fields Status</h2>
-            <div id="quick-view-content"></div>
-        </div>
-    </div>
-
-    <div id="stakeholder-map-modal" class="modal">
-        <div class="modal-content" id="stakeholder-map-modal-content">
-            <span id="stakeholder-map-close-btn" class="close-button">&times;</span>
-            <h2>Stakeholder Influence Map</h2>
-            
-            <div class="map-controls">
-                <input type="text" id="new-stakeholder-name" placeholder="Stakeholder Name">
-                <input type="text" id="new-stakeholder-title" placeholder="Title/Role">
-                <button type="button" id="add-stakeholder-btn">Add Stakeholder</button>
-            </div>
-
-            <div id="stakeholder-canvas-wrapper">
-                <div id="stakeholder-canvas">
-                </div>
-                 <svg id="line-canvas">
-                     <defs>
-                        <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5"
-                            markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                              <path d="M 0 0 L 10 5 L 0 10 z" fill="#888"></path>
-                                </marker>
-                        </defs>
-                 </svg>
-            </div>
-        </div>
-    </div>
-    
-    <div id="floating-progress-bar" class="progress-container">
-        <div class="progress-bar-label">
+    <div id="dynasty-info-box" class="hidden">
+        <div class="flex items-center gap-3">
             <div>
-                <span>Status: </span>
-                <span id="progress-status">Major Risk</span>
+                <p id="info-box-coach" class="font-bold text-sm"></p>
+                <div class="flex items-center gap-2">
+                    <img id="info-box-logo" src="" alt="Team Logo" class="h-6 w-6 object-contain">
+                    <p id="info-box-team" class="text-xs"></p>
+                </div>
             </div>
-            <span id="progress-text">0%</span>
-        </div>
-        <div class="progress-bar">
-            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+            <div class="border-l border-gray-600 pl-3 text-center">
+                <p id="info-box-year" class="font-bold text-lg"></p>
+                <p id="info-box-week" class="text-xs text-gray-400"></p>
+            </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <div id="app-container" class="min-h-screen p-4">
+
+        <div id="auth-view" class="view active w-full max-w-md mx-auto">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl md:text-5xl font-bold text-white">College Football 26</h1>
+                <h2 class="text-2xl md:text-3xl font-semibold text-blue-400">Dynasty Tracker</h2>
+            </div>
+            <div id="login-form-container" class="bg-gray-800 p-8 rounded-lg shadow-lg">
+                <h3 class="text-2xl font-bold mb-6 text-center">Sign In</h3>
+                <form id="login-form"><div class="mb-4"><label for="login-email" class="block text-gray-300 mb-2">Email</label><input type="email" id="login-email" class="w-full input-field" required></div><div class="mb-6"><label for="login-password" class="block text-gray-300 mb-2">Password</label><input type="password" id="login-password" class="w-full input-field" required></div><button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300">Login</button></form>
+                <p id="login-error" class="text-red-500 text-center mt-4"></p><p class="text-center mt-4 text-gray-400">Don't have an account? <a href="#" id="show-register-link" class="text-blue-400 hover:underline">Sign Up</a></p>
+            </div>
+            <div id="register-form-container" class="bg-gray-800 p-8 rounded-lg shadow-lg hidden">
+                <h3 class="text-2xl font-bold mb-6 text-center">Create Account</h3>
+                <form id="register-form"><div class="mb-4"><label for="register-email" class="block text-gray-300 mb-2">Email</label><input type="email" id="register-email" class="w-full input-field" required></div><div class="mb-6"><label for="register-password" class="block text-gray-300 mb-2">Password</label><input type="password" id="register-password" class="w-full input-field" required></div><button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition duration-300">Register</button></form>
+                <p id="register-error" class="text-red-500 text-center mt-4"></p><p class="text-center mt-4 text-gray-400">Already have an account? <a href="#" id="show-login-link" class="text-blue-400 hover:underline">Sign In</a></p>
+            </div>
+        </div>
+
+        <div id="app-view" class="view w-full max-w-4xl mx-auto">
+            <div class="bg-gray-800 p-8 rounded-lg shadow-lg"><div class="flex justify-between items-center mb-6"><div><h3 class="text-2xl font-bold">Welcome!</h3><p class="text-gray-400" id="user-email-display"></p></div><button id="logout-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition duration-300">Logout</button></div><div class="border-t border-gray-700 pt-6"><div class="flex justify-between items-center mb-4"><h4 class="text-xl font-semibold">Your Dynasties</h4><button id="create-dynasty-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">+ Create New Dynasty</button></div><div id="dynasties-list" class="mt-4 space-y-3"></div></div></div>
+        </div>
+
+        <div id="dynasty-view" class="view w-full max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="w-full md:w-1/4 lg:w-1/5 bg-gray-800 p-4 rounded-lg shadow-lg"><button id="back-to-dynasties-btn" class="w-full text-left mb-4 text-blue-400 hover:underline">&larr; Back to All Dynasties</button><h3 id="dynasty-nav-title" class="text-xl font-bold mb-4 border-b border-gray-700 pb-2"></h3>
+                    <nav id="dynasty-nav" class="space-y-1">
+                        <a href="#" class="nav-link" data-page="home-page"><i class="fa-solid fa-house nav-icon"></i>Home</a>
+                        <a href="#" class="nav-link" data-page="schedule-page"><i class="fa-solid fa-calendar-days nav-icon"></i>Schedule</a>
+                        <a href="#" class="nav-link" data-page="roster-page"><i class="fa-solid fa-users nav-icon"></i>Roster</a>
+                        <a href="#" class="nav-link" data-page="depth-chart-page"><i class="fa-solid fa-clipboard-list nav-icon"></i>Depth Chart</a>
+                        <a href="#" class="nav-link" data-page="recruiting-page"><i class="fa-solid fa-star nav-icon"></i>Recruiting</a>
+                        <a href="#" class="nav-link" data-page="transfer-portal-page"><i class="fa-solid fa-right-left nav-icon"></i>Transfer Portal</a>
+                        <a href="#" class="nav-link" data-page="player-stats-page"><i class="fa-solid fa-chart-simple nav-icon"></i>Player Stats</a>
+                        <a href="#" class="nav-link" data-page="school-records-page"><i class="fa-solid fa-book-bookmark nav-icon"></i>School Records</a>
+                        <a href="#" class="nav-link" data-page="trophy-room-page"><i class="fa-solid fa-trophy nav-icon"></i>Trophy Room</a>
+                        <a href="#" class="nav-link" data-page="coaches-page"><i class="fa-solid fa-user-tie nav-icon"></i>Coaches</a>
+                        <a href="#" class="nav-link" data-page="nfl-page"><i class="fa-solid fa-shield-halved nav-icon"></i>Players in the NFL</a>
+                    </nav>
+                </div>
+                <div class="w-full md:w-3/4 lg:w-4/5">
+                    <div id="home-page" class="dynasty-page"></div>
+                    <div id="schedule-page" class="dynasty-page"></div>
+                    <div id="roster-page" class="dynasty-page"></div>
+                    <div id="depth-chart-page" class="dynasty-page"></div>
+                    <div id="recruiting-page" class="dynasty-page"></div>
+                    <div id="transfer-portal-page" class="dynasty-page"></div>
+                    <div id="player-stats-page" class="dynasty-page"><h2 class="text-3xl font-bold">Player Stats</h2><p class="mt-4 text-gray-400">Coming soon.</p></div>
+                    <div id="school-records-page" class="dynasty-page"><h2 class="text-3xl font-bold">School Records</h2><p class="mt-4 text-gray-400">Coming soon.</p></div>
+                    <div id="trophy-room-page" class="dynasty-page"><h2 class="text-3xl font-bold">Trophy Room</h2><p class="mt-4 text-gray-400">Coming soon.</p></div>
+                    <div id="coaches-page" class="dynasty-page"><h2 class="text-3xl font-bold">Coaches</h2><p class="mt-4 text-gray-400">Coming soon.</p></div>
+                    <div id="nfl-page" class="dynasty-page"><h2 class="text-3xl font-bold">Players in the NFL</h2><p class="mt-4 text-gray-400">Coming soon.</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="create-dynasty-modal" class="modal"><div class="modal-content"><h3 class="text-2xl font-bold mb-6">Create a New Dynasty</h3><form id="create-dynasty-form"><div class="mb-4"><label for="dynasty-name" class="block text-gray-300 mb-2">Dynasty Name</label><input type="text" id="dynasty-name" class="w-full input-field" required placeholder="e.g., My Georgia Tech Dynasty"></div><p id="dynasty-create-error" class="text-red-500 text-center mb-4"></p><div class="flex justify-end space-x-4"><button type="button" id="cancel-dynasty-creation" class="btn-secondary">Cancel</button><button type="submit" class="btn-primary">Create</button></div></form></div></div>
+    <div id="create-coach-modal" class="modal"><div class="modal-content-lg"><h3 class="text-2xl font-bold mb-6">Create Your Coach</h3><form id="create-coach-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4"><div><label for="coach-first-name" class="block text-gray-300 mb-2">First Name</label><input type="text" id="coach-first-name" class="w-full input-field" required></div><div><label for="coach-last-name" class="block text-gray-300 mb-2">Last Name</label><input type="text" id="coach-last-name" class="w-full input-field" required></div><div class="md:col-span-2"><label for="coach-hometown" class="block text-gray-300 mb-2">Hometown</label><input type="text" id="coach-hometown" class="w-full input-field" required placeholder="e.g., Atlanta, GA"></div><div><label for="coach-alma-mater" class="block text-gray-300 mb-2">Alma Mater</label><select id="coach-alma-mater" class="w-full input-field" required></select></div><div><label for="coach-age" class="block text-gray-300 mb-2">Age</label><input type="number" id="coach-age" class="w-full input-field" required min="22" max="80" value="45"></div><div><label for="coach-job" class="block text-gray-300 mb-2">Starting Job</label><select id="coach-job" class="w-full input-field" required><option value="HC">Head Coach (HC)</option><option value="OC">Offensive Coordinator (OC)</option><option value="DC">Defensive Coordinator (DC)</option></select></div><div><label for="coach-school" class="block text-gray-300 mb-2">Team</label><select id="coach-school" class="w-full input-field" required></select></div><p id="coach-create-error" class="text-red-500 text-center md:col-span-2"></p><div class="md:col-span-2 flex justify-end space-x-4 mt-4"><button type="button" id="cancel-coach-creation" class="btn-secondary">Cancel</button><button type="submit" class="btn-primary">Start Career</button></div></form></div></div>
+    <div id="confirm-advance-season-modal" class="modal"><div class="modal-content"><h3 class="text-2xl font-bold mb-4">Start New Season?</h3><p class="text-gray-300 mb-6">This is your last chance to edit any stats, info, or results for the current season. Once you start a new season, the schedule will be cleared and all commits will be added to the roster.</p><p id="advance-season-error" class="text-red-500 text-center mb-4"></p><div class="flex justify-end space-x-4"><button type="button" id="cancel-advance-season" class="btn-secondary">Cancel</button><button type="button" id="confirm-advance-season-btn" class="btn-primary bg-green-600 hover:bg-green-700">Confirm & Start New Season</button></div></div></div>
+    <div id="player-modal" class="modal"><div class="modal-content-lg"><h3 id="player-modal-title" class="text-2xl font-bold mb-6">Add New Player</h3><form id="player-form" class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4"><div><label for="player-first-name" class="label">First Name</label><input type="text" id="player-first-name" class="input-field" required></div><div><label for="player-last-name" class="label">Last Name</label><input type="text" id="player-last-name" class="input-field" required></div><div><label for="player-jersey" class="label">Jersey #</label><input type="number" id="player-jersey" class="input-field" min="1" max="99" required></div><div><label for="player-position" class="label">Position</label><select id="player-position" class="input-field" required></select></div><div><label for="player-year" class="label">Year</label><select id="player-year" class="input-field" required></select></div><div><label for="player-rating" class="label">Rating</label><input type="number" id="player-rating" class="input-field" min="40" max="99" required></div><div><label for="player-height" class="label">Height</label><select id="player-height" class="input-field" required></select></div><div><label for="player-weight" class="label">Weight</label><input type="number" id="player-weight" class="input-field" min="150" max="400" required></div><div class="md:col-span-3"><label for="player-hometown" class="label">Hometown</label><input type="text" id="player-hometown" class="input-field" placeholder="e.g., Atlanta, GA"></div><input type="hidden" id="player-id"><div class="md:col-span-3 flex justify-end space-x-4 mt-4"><button type="button" id="cancel-player-form" class="btn-secondary">Cancel</button><button type="submit" class="btn-primary">Save Player</button></div></form></div></div>
+    <div id="player-card-modal" class="modal"><div class="modal-content-lg"><div id="player-card-content"></div></div></div>
+    <div id="recruiting-modal" class="modal"><div class="modal-content-lg"><h3 id="recruit-modal-title" class="text-2xl font-bold mb-6">Add New Commit</h3><form id="recruit-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4"><div><label for="recruit-first-name" class="label">First Name</label><input type="text" id="recruit-first-name" class="input-field" required></div><div><label for="recruit-last-name" class="label">Last Name</label><input type="text" id="recruit-last-name" class="input-field" required></div><div><label for="recruit-position" class="label">Position</label><select id="recruit-position" class="input-field" required></select></div><div class="flex items-center space-x-2"><div><label for="recruit-natl-rank" class="label">Natl. Rank</label><input type="number" id="recruit-natl-rank" class="input-field" min="1"></div><div><label for="recruit-pos-rank" class="label">Pos. Rank</label><input type="number" id="recruit-pos-rank" class="input-field" min="1"></div></div><div><label for="recruit-hometown" class="label">Hometown</label><input type="text" id="recruit-hometown" class="input-field" placeholder="e.g., Atlanta, GA"></div><div class="flex items-center space-x-2"><div><label for="recruit-height" class="label">Height</label><select id="recruit-height" class="input-field" required></select></div><div><label for="recruit-weight" class="label">Weight</label><input type="number" id="recruit-weight" class="input-field" min="150" max="400" required></div></div><div class="md:col-span-2"><label class="label">Star Rating</label><div id="recruit-star-rating" class="flex items-center text-2xl text-gray-500"><i class="fa-regular fa-star star-icon cursor-pointer" data-value="1"></i><i class="fa-regular fa-star star-icon cursor-pointer" data-value="2"></i><i class="fa-regular fa-star star-icon cursor-pointer" data-value="3"></i><i class="fa-regular fa-star star-icon cursor-pointer" data-value="4"></i><i class="fa-regular fa-star star-icon cursor-pointer" data-value="5"></i></div></div><div class="md:col-span-2"><label class="label">Prospect Type</label><div class="flex gap-4"><label class="flex items-center"><input type="checkbox" id="recruit-is-gem" class="form-checkbox-gem"> <span class="ml-2">Gem</span></label><label class="flex items-center"><input type="checkbox" id="recruit-is-bust" class="form-checkbox-bust"> <span class="ml-2">Bust</span></label></div></div><input type="hidden" id="recruit-id"><div class="md:col-span-2 flex justify-end space-x-4 mt-4"><button type="button" id="cancel-recruit-form" class="btn-secondary">Cancel</button><button type="submit" class="btn-primary">Save Commit</button></div></form></div></div>
+    <div id="transfer-in-modal" class="modal"><div class="modal-content-lg"><h3 class="text-2xl font-bold mb-6">Add Incoming Transfer</h3><form id="transfer-in-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4"><div><label class="label">First Name</label><input type="text" id="transfer-in-first-name" class="input-field" required></div><div><label class="label">Last Name</label><input type="text" id="transfer-in-last-name" class="input-field" required></div><div><label class="label">Position</label><select id="transfer-in-position" class="input-field" required></select></div><div><label class="label">Year</label><select id="transfer-in-year" class="input-field" required></select></div><div class="flex items-center space-x-2"><div><label class="label">Natl. Rank</label><input type="number" id="transfer-in-natl-rank" class="input-field" min="1"></div><div><label class="label">Pos. Rank</label><input type="number" id="transfer-in-pos-rank" class="input-field" min="1"></div></div><div><label class="label">Previous School</label><select id="transfer-in-prev-school" class="input-field" required></select></div><div><label class="label">Hometown</label><input type="text" id="transfer-in-hometown" class="input-field" placeholder="e.g., Atlanta, GA"></div><div class="flex items-center space-x-2"><div><label class="label">Height</label><select id="transfer-in-height" class="input-field" required></select></div><div><label class="label">Weight</label><input type="number" id="transfer-in-weight" class="input-field" min="150" max="400" required></div></div><div class="md:col-span-2"><label class="label">Star Rating</label><div id="transfer-in-star-rating" class="flex items-center text-2xl text-gray-500"><i class="fa-regular fa-star star-icon cursor-pointer" data-value="1"></i><i class="fa-regular fa-star star-icon cursor-pointer" data-value="2"></i><i class="fa-regular fa-star star-icon cursor-pointer" data-value="3"></i><i class="fa-regular fa-star star-icon cursor-pointer" data-value="4"></i><i class="fa-regular fa-star star-icon cursor-pointer" data-value="5"></i></div></div><div class="md:col-span-2 flex justify-end space-x-4 mt-4"><button type="button" id="cancel-transfer-in-form" class="btn-secondary">Cancel</button><button type="submit" class="btn-primary">Add Transfer</button></div></form></div></div>
+    <div id="transfer-out-modal" class="modal"><div class="modal-content"><h3 class="text-2xl font-bold mb-6">Log Outgoing Transfer</h3><form id="transfer-out-form"><div><label class="label">Select Player from Roster</label><select id="transfer-out-player" class="input-field" required></select></div><div class="mt-4"><label class="label">New School</label><select id="transfer-out-new-school" class="input-field" required></select></div><div class="flex justify-end space-x-4 mt-6"><button type="button" id="cancel-transfer-out-form" class="btn-secondary">Cancel</button><button type="submit" class="btn-primary bg-red-600 hover:bg-red-700">Confirm Transfer</button></div></form></div></div>
+
+    <script type="module" src="script.js"></script>
 </body>
 </html>
